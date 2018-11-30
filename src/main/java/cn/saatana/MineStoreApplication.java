@@ -6,9 +6,9 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
 @ServletComponentScan
-public class SpringBootDemoApplication {
+public class MineStoreApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootDemoApplication.class, args);
+		SpringApplication.run(MineStoreApplication.class, args);
 	}
 }
