@@ -24,7 +24,6 @@ public class User extends CommonEntity {
 	@NotEmpty
 	@Column(name = "username", length = 20)
 	private String username;
-	@NotEmpty
 	@Column(name = "password", length = 120)
 	private String password;
 	@Column(name = "phone", length = 20)
