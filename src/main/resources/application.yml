@@ -1,5 +1,7 @@
 server:
   port: 8888
+  servlet:
+    context-path: /shop-api
 logging:
   path: C:/TEMP/MineStore/logs
   level:

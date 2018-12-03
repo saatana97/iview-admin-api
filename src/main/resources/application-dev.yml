@@ -1,2 +1,2 @@
 app:
-  enable-safer: false
+  enable-safer: true

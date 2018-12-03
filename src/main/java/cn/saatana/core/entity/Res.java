@@ -11,7 +11,7 @@ public class Res<T> {
 	private Date serviceTime = new Date();
 
 	public static <T> Res<T> ok(T data) {
-		return of(HttpStatus.OK.value(), "接口调用成功", data);
+		return of(HttpStatus.OK.value(), "操作成功", data);
 	}
 
 	public static <T> Res<T> ok(String message, T data) {
@@ -19,7 +19,7 @@ public class Res<T> {
 	}
 
 	public static <T> Res<T> error(T data) {
-		return of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "接口调用失败", data);
+		return of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "操作失败", data);
 	}
 
 	public static <T> Res<T> error(String message, T data) {

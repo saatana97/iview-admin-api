@@ -23,13 +23,12 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 根据ID查询数据
 	 *
-	 * @param id
-	 *            唯一标识ID
+	 * @param id 唯一标识ID
 	 * @return 实体
 	 */
 	@Transactional(readOnly = true)
 	public Entity get(Integer id) {
-		return repository.getOne(id);
+		return repository.findById(id).get();
 	}
 
 	/**
@@ -37,12 +36,9 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	 *
 	 * @see 如需自定义可重写本方法
 	 *
-	 * @param entity
-	 *            查询条件
-	 * @param index
-	 *            页码
-	 * @param limit
-	 *            页容量
+	 * @param entity 查询条件
+	 * @param index  页码
+	 * @param limit  页容量
 	 * @return 分页数据
 	 */
 	@Transactional(readOnly = true)
@@ -67,8 +63,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 根据条件查询数据，默认只查询数据状态正常（STATUS_NORMAL）的数据
 	 *
-	 * @param entity
-	 *            查询条件
+	 * @param entity 查询条件
 	 * @return
 	 */
 	@Transactional(readOnly = true)
@@ -80,8 +75,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 根据ID集合查询数据集合
 	 *
-	 * @param ids
-	 *            唯一标识ID集合
+	 * @param ids 唯一标识ID集合
 	 * @return 实体集合
 	 */
 	public List<Entity> findAllByIds(Iterable<Integer> ids) {
@@ -91,8 +85,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 创建一条数据，自动填充创建人、创建时间
 	 *
-	 * @param entity
-	 *            实体
+	 * @param entity 实体
 	 */
 	public void create(Entity entity) {
 		if (entity != null) {
@@ -104,8 +97,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 批量创建数据，自动填充创建人、创建时间
 	 *
-	 * @param entities
-	 *            实体集合
+	 * @param entities 实体集合
 	 */
 	public void createAll(Iterable<Entity> entities) {
 		if (entities != null) {
@@ -120,8 +112,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 修改数据，自动填充最后修改人、最后修改时间
 	 *
-	 * @param entity
-	 *            实体
+	 * @param entity 实体
 	 */
 	public void update(Entity entity) {
 		update(entity, true);
@@ -130,10 +121,8 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 修改数据，自动填充最后修改人、最后修改时间
 	 *
-	 * @param entity
-	 *            实体
-	 * @param updateUpdateDate
-	 *            是否更新最后更新时间
+	 * @param entity           实体
+	 * @param updateUpdateDate 是否更新最后更新时间
 	 */
 	public void update(Entity entity, boolean updateUpdateDate) {
 		if (entity != null) {
@@ -147,8 +136,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 批量修改数据，自动填充最后修改人、最后修改时间
 	 *
-	 * @param entities
-	 *            实体集合
+	 * @param entities 实体集合
 	 */
 	public void updateAll(Iterable<Entity> entities) {
 		if (entities != null) {
@@ -163,8 +151,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 逻辑删除数据，将数据状态改为删除（STATUS_DELETED），自动填充最后修改人、最后修改时间
 	 *
-	 * @param entity
-	 *            实体
+	 * @param entity 实体
 	 */
 	public void remove(Entity entity) {
 		if (entity != null) {
@@ -191,8 +178,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 恢复数据，将数据状态改为正常（STATUS_NORMAL），自动填充最后修改人、最后修改时间
 	 *
-	 * @param entity
-	 *            实体
+	 * @param entity 实体
 	 */
 	public void restore(Entity entity) {
 		if (entity != null) {
@@ -204,8 +190,7 @@ public class CommonService<Repository extends CommonRepository<Entity>, Entity e
 	/**
 	 * 批量恢复数据，将数据状态改为正常（STATUS_NORMAL），自动填充最后修改人、最后修改时间
 	 *
-	 * @param entities
-	 *            实体集合
+	 * @param entities 实体集合
 	 */
 	public void restoreAll(Iterable<Entity> entities) {
 		if (entities != null) {

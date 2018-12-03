@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.validation.ValidationException;
+import javax.websocket.server.PathParam;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,10 +100,8 @@ public class CommonController<Service extends CommonService<Repository, Entity>,
 	 *
 	 * @see 包装了org.springframework.beans.BeanUtils.copyProperties(Object obj,Object
 	 *      obj,String... ignoreProperties)方法
-	 * @param source
-	 *            源对象
-	 * @param target
-	 *            目标对象
+	 * @param source 源对象
+	 * @param target 目标对象
 	 */
 	protected void copyNotNullProperties(Object source, Object target) {
 		BeanUtils.copyProperties(source, target, getPropertiesWithNullValue(source).toArray(new String[0]));
@@ -143,6 +143,11 @@ public class CommonController<Service extends CommonService<Repository, Entity>,
 		return Res.ok(service.findPage(entity, index, limit));
 	}
 
+	@PostMapping("get/{id}")
+	public Res<Entity> get(@PathVariable Integer id) {
+		return Res.ok(service.get(id));
+	}
+
 	@RequestMapping("list")
 	public Res<List<Entity>> list(Entity entity) {
 		return Res.ok(service.findList(entity));
@@ -173,8 +178,8 @@ public class CommonController<Service extends CommonService<Repository, Entity>,
 		}
 	}
 
-	@PostMapping("remove")
-	public Res<Entity> remove(Integer id) {
+	@PostMapping("remove/{id}")
+	public Res<Entity> remove(@PathVariable Integer id) {
 		Entity entity = service.get(id);
 		service.remove(entity);
 		return Res.ok(entity);
@@ -187,8 +192,8 @@ public class CommonController<Service extends CommonService<Repository, Entity>,
 		return Res.ok(list);
 	}
 
-	@PostMapping("restore")
-	public Res<Entity> restore(Integer id) {
+	@PostMapping("restore/{id}")
+	public Res<Entity> restore(@PathVariable Integer id) {
 		Entity entity = service.get(id);
 		service.restore(entity);
 		return Res.ok(entity);

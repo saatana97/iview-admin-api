@@ -13,6 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import cn.saatana.core.Safer;
 
 @MappedSuperclass
@@ -103,10 +106,12 @@ public abstract class CommonEntity implements Serializable {
 		this.updateBy = updateBy;
 	}
 
+	@JsonIgnore
 	public int getDataStatus() {
 		return dataStatus;
 	}
 
+	@JsonProperty
 	public void setDataStatus(int dataStatus) {
 		this.dataStatus = dataStatus;
 	}
