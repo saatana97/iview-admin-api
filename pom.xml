@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cn.saatana</groupId>
-	<artifactId>MineStore</artifactId>
+	<artifactId>iView-admin-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>MineStore</name>
-	<description>The API of my store</description>
+	<name>iView-admin-api</name>
+	<description>The API of iView-admin frame</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

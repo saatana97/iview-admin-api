@@ -9,11 +9,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class AppConfig implements WebMvcConfigurer {
 	@Autowired
 	private GlobalInterceptHandler globalInterceptHandler;
+	@Autowired
+	private OparetionLogInterceptHandler oparetionLogInterceptHandler;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		WebMvcConfigurer.super.addInterceptors(registry);
 		registry.addInterceptor(globalInterceptHandler);
+		registry.addInterceptor(oparetionLogInterceptHandler);
 	}
 
 }

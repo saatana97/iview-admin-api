@@ -25,3 +25,5 @@ spring:
     default-property-inclusion: non-null
 app:
   enable-safer: true
+  log-request-info: true
+  allow-local-cross-domain: false

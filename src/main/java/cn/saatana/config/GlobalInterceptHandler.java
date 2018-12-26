@@ -18,20 +18,24 @@ import com.alibaba.fastjson.JSON;
 import cn.saatana.core.Safer;
 import cn.saatana.core.annotation.Admin;
 import cn.saatana.core.annotation.Guest;
-import cn.saatana.core.entity.Res;
-import cn.saatana.core.entity.UserInfo;
+import cn.saatana.core.auth.entity.AuthorizationInformation;
+import cn.saatana.core.common.Res;
+import cn.saatana.core.utils.IPUtils;
 
 @Configuration
 public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 	private final Logger log = Logger.getLogger("GlobalInterceptHandler");
 	@Autowired
 	private AppProperties appProp;
+	@Autowired
+	private TextProperties textProp;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		boolean result = true;
-		if (request.getRemoteHost().equals("0:0:0:0:0:0:0:1")) {
+		// 允许本地请求跨域访问
+		if (appProp.isAllowLocalCrossDomain() && request.getRemoteHost().equals("0:0:0:0:0:0:0:1")) {
 			response.addHeader("Access-Control-Allow-Origin", "*");
 		}
 		// 设置响应类型及编码
@@ -39,26 +43,29 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 		response.setCharacterEncoding("UTF-8");
 		// 判断是否启用了权限系统，判断当前访问的资源是否需要登陆授权
 		if (appProp.isEnableSafer() && needAuthorized(handler)) {
-			UserInfo user = Safer.currentUserInfo();
+			AuthorizationInformation user = Safer.currentAuthInfo();
 			if (user == null) {
-				// 未登录授权的提示语
 				if (StringUtils.isEmpty(Safer.scanToken())) {
-					response.getWriter()
-							.println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(), "未经授权的访问", "请登录后再尝试访问其他资源")));
+					// 未登录授权的提示语
+					response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
+							textProp.getUnauthorizedMessage(), textProp.getUnauthorizedData())));
 				} else {
-					response.getWriter().println(
-							JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(), "你的登录信息已失效", "请重新登录再尝试访问其他资源")));
+					// 登录信息失效的提示语
+					response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
+							textProp.getInvalidTokenMessage(), textProp.getInvalidTokenData())));
 				}
 				result = false;
-			} else if (needAdmin(handler) && !user.getUser().getUsername().equals("admin")) {
+			} else if (needAdmin(handler) && !user.getAuth().getUsername().equals("admin")) {
 				// 需要管理员权限的提示语
-				response.getWriter()
-						.println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(), "权限不足", "只有管理员账号才有权限访问当前资源")));
+				response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
+						textProp.getNoAccessMessage(), textProp.getNoAccessMessage())));
 				result = false;
 			}
 		}
-		// 记录请求信息
-		logRequestInfo(request, result);
+		if (appProp.isLogRequestInfo()) {
+			// 记录请求信息
+			logRequestInfo(request, result);
+		}
 		return result;
 	}
 
@@ -98,10 +105,11 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 		return result;
 	}
 
-	private void logRequestInfo(HttpServletRequest request, boolean auth) {
+	private synchronized void logRequestInfo(HttpServletRequest request, boolean auth) {
 		log.log(Level.INFO, "==========================================================================");
 		log.log(Level.INFO, "SESSIONID:\t" + request.getSession().getId());
-		log.log(Level.INFO, "USERINFO:\t" + Safer.currentUserInfo());
+		log.log(Level.INFO, "IP:\t" + IPUtils.getIP(request));
+		log.log(Level.INFO, "USERINFO:\t" + Safer.currentAuthInfo());
 		log.log(Level.INFO, "URI:\t" + request.getRequestURI());
 		log.log(Level.INFO, "AUTH:\t" + auth);
 		log.log(Level.INFO, "METHOD:\t" + request.getMethod());

@@ -14,18 +14,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import cn.saatana.core.entity.User;
-import cn.saatana.core.entity.UserInfo;
+import cn.saatana.core.auth.entity.AuthorizationInformation;
+import cn.saatana.core.auth.entity.Authorizer;
 
 /**
  * 应用安全类
  *
- * @author saatana
+ * @author 向文可
  *
  */
 @Component
 public class Safer {
-	private static Map<String, UserInfo> loginInfo = new ConcurrentHashMap<>();
+	private static Map<String, AuthorizationInformation> loginInfo = new ConcurrentHashMap<>();
 
 	private static String generateToken() {
 		return UUID.randomUUID().toString().replaceAll("-", "");
@@ -56,11 +56,11 @@ public class Safer {
 	 *            用户
 	 * @return token
 	 */
-	public static UserInfo login(User user) {
+	public static AuthorizationInformation login(Authorizer user) {
 		HttpServletRequest request = currentRequest();
 		HttpServletResponse response = currentResponse();
 		String token = generateToken();
-		UserInfo userInfo = new UserInfo(token, request.getSession().getId(), user);
+		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(), user);
 		loginInfo.put(token, userInfo);
 		Cookie cookie = new Cookie("token", token);
 		cookie.setPath("/");
@@ -77,12 +77,36 @@ public class Safer {
 	}
 
 	/**
-	 * 获取当前用户信息
+	 * 获取当前授权信息
 	 *
 	 * @return
 	 */
-	public static UserInfo currentUserInfo() {
+	public static AuthorizationInformation currentAuthInfo() {
 		String token = scanToken();
+		return loginInfo.get(token);
+	}
+
+	/**
+	 * 获取当前授权者ID
+	 *
+	 * @return
+	 */
+	public static Integer currentAuthId() {
+		Integer res = 0;
+		AuthorizationInformation authInfo = currentAuthInfo();
+		if (authInfo != null) {
+			res = authInfo.getAuth().getId();
+		}
+		return res;
+	}
+
+	/**
+	 * 根据token获取授权信息
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public static AuthorizationInformation getAuthorizerByToken(String token) {
 		return loginInfo.get(token);
 	}
 
@@ -96,7 +120,10 @@ public class Safer {
 				.getRequest();
 		String token = request.getParameter("token");
 		if (StringUtils.isEmpty(token)) {
-			token = request.getHeader("token");
+			token = request.getHeader("Authorization");
+			if (StringUtils.isEmpty(token)) {
+				token = request.getHeader("token");
+			}
 		}
 		if (StringUtils.isEmpty(token)) {
 			Cookie[] cookies = request.getCookies();
