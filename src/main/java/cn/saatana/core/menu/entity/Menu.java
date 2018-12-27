@@ -116,24 +116,4 @@ public class Menu extends CommonEntity {
 		return super.getUpdator();
 	}
 
-	@JsonGetter
-	public String getCreatorUsername() {
-		String res = null;
-		Authorizer auth = super.getCreator();
-		if (auth != null) {
-			res = auth.getUsername();
-		}
-		return res;
-	}
-
-	@JsonGetter
-	public String getUpdatorUsername() {
-		String res = null;
-		Authorizer auth = super.getUpdator();
-		if (auth != null) {
-			res = auth.getUsername();
-		}
-		return res;
-	}
-
 }

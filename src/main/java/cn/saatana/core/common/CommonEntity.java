@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -125,5 +126,25 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 	@JsonProperty
 	public void setDataStatus(int dataStatus) {
 		this.dataStatus = dataStatus;
+	}
+
+	@JsonGetter
+	public String getCreatorUsername() {
+		String res = null;
+		Authorizer auth = this.getCreator();
+		if (auth != null) {
+			res = auth.getUsername();
+		}
+		return res;
+	}
+
+	@JsonGetter
+	public String getUpdatorUsername() {
+		String res = null;
+		Authorizer auth = this.getUpdator();
+		if (auth != null) {
+			res = auth.getUsername();
+		}
+		return res;
 	}
 }
