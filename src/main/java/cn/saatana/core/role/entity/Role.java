@@ -9,6 +9,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import cn.saatana.core.auth.entity.Authorizer;
 import cn.saatana.core.common.CommonEntity;
 import cn.saatana.core.menu.entity.Menu;
 
@@ -58,5 +62,30 @@ public class Role extends CommonEntity {
 	@Override
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@JsonGetter
+	public String getMenusName() {
+		StringBuilder sb = new StringBuilder();
+		this.menus.forEach(item -> {
+			sb.append(item.getTitle());
+			sb.append(",");
+		});
+		if (this.menus.size() != 0) {
+			sb.setLength(sb.length() - 1);
+		}
+		return sb.toString();
+	}
+
+	@JsonIgnore
+	@Override
+	public Authorizer getCreator() {
+		return super.getCreator();
+	}
+
+	@JsonIgnore
+	@Override
+	public Authorizer getUpdator() {
+		return super.getUpdator();
 	}
 }

@@ -2,9 +2,7 @@ package cn.saatana.core.auth.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -31,11 +29,10 @@ public class Authorizer extends CommonEntity {
 	private String password;
 	@Column(name = "login_date")
 	private Date loginDate;
-	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinTable(name = "r_user_role", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "role_id") })
-	private Set<Role> roleList = new HashSet<>();
+	private List<Role> roles = new ArrayList<>();
 	@Transient
 	private List<Menu> menus = new ArrayList<>();
 
@@ -67,12 +64,12 @@ public class Authorizer extends CommonEntity {
 		this.menus = menus;
 	}
 
-	public Set<Role> getRoleList() {
-		return roleList;
+	public List<Role> getRoles() {
+		return roles;
 	}
 
-	public void setRoleList(Set<Role> roleList) {
-		this.roleList = roleList;
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
 	}
 
 	public String getUsername() {

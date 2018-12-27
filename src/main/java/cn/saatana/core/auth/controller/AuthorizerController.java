@@ -53,5 +53,4 @@ public class AuthorizerController extends CommonController<AuthorizerService, Au
 	public Res<Boolean> invalid(String token) {
 		return Res.ok(Safer.getAuthorizerByToken(token) != null);
 	}
-
 }
