@@ -1,10 +1,14 @@
 package cn.saatana.core.menu.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +33,8 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 	@RequestMapping("tree")
 	public Res<List<Menu>> tree() {
 		// TODO 将查询全部菜单改为查询当前用户有权限查看的菜单
-		List<Menu> all = service.findAll();
+		Menu menu = new Menu();
+		List<Menu> all = service.findList(menu);
 		Map<Integer, Menu> map = new HashMap<>();
 		all.forEach(item -> {
 			map.put(item.getId(), item);
@@ -49,6 +54,50 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 			}
 		});
 		return Res.ok(root);
+	}
+
+	@PostMapping("create")
+	@Override
+	public Res<Menu> create(@RequestBody Menu entity, BindingResult result) throws UnsupportedEncodingException {
+		entity.setRouter(buildRouter(entity));
+		return super.create(entity, result);
+	}
+
+	/**
+	 * 根据上级菜单重新构建路由路径
+	 *
+	 * @param menu
+	 * @return
+	 */
+	public String buildRouter(Menu menu) {
+		String res = menu.getRouter();
+		String base = "";
+		Menu parent = menu.getParent();
+		if (parent != null) {
+			base = parent.getRouter();
+			if (res.startsWith(base)) {
+				base = "";
+			}
+		}
+		int i = 0;
+		if (base.endsWith("/")) {
+			i++;
+		}
+		if (res.startsWith("/")) {
+			i++;
+		}
+		switch (i) {
+		case 0:
+			res = base + "/" + res;
+			break;
+		case 1:
+			res = base + res;
+			break;
+		case 2:
+			res = (base + res).replace("//", "/");
+			break;
+		}
+		return res;
 	}
 
 	@RequestMapping("checkRepeat")
