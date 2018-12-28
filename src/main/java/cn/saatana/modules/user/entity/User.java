@@ -13,7 +13,7 @@ import cn.saatana.core.common.CommonEntity;
 @Table(name = "user")
 public class User extends CommonEntity {
 	private static final long serialVersionUID = 1L;
-	@OneToOne(cascade = CascadeType.REFRESH)
+	@OneToOne(cascade = CascadeType.ALL)
 	private Authorizer authorizer;
 
 	private String name;
@@ -108,10 +108,12 @@ public class User extends CommonEntity {
 		this.type = type;
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}

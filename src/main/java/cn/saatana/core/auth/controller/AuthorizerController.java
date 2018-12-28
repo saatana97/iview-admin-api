@@ -2,6 +2,7 @@ package cn.saatana.core.auth.controller;
 
 import java.util.Date;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,5 +53,11 @@ public class AuthorizerController extends CommonController<AuthorizerService, Au
 	@LogOparetion(value = "验证授权码", ignore = true)
 	public Res<Boolean> invalid(String token) {
 		return Res.ok(Safer.getAuthorizerByToken(token) != null);
+	}
+
+	@PostMapping("checkRepeat/{username}")
+	@LogOparetion(value = "用户名校验", ignore = true)
+	public Res<Boolean> checkRepeat(@PathVariable String username) {
+		return Res.ok(service.getByUsername(username) == null);
 	}
 }
