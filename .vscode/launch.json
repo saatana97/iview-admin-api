@@ -6,14 +6,11 @@
 	"configurations": [
 		{
 			"type": "java",
-			"name": "Debug (Launch)-MineStoreApplication<MineStore>",
+			"name": "Debug (Launch)-IViewAdminApiApplication<iview-admin-api>",
 			"request": "launch",
-			"cwd": "${workspaceFolder}",
-			"console": "internalConsole",
-			"stopOnEntry": false,
-			"mainClass": "cn.saatana.MineStoreApplication",
+			"mainClass": "cn.saatana.IViewAdminApiApplication",
 			"args": "--spring.profiles.active=dev",
-			"projectName": "MineStore"
+			"projectName": "iview-admin-api"
 		}
 	]
 }
