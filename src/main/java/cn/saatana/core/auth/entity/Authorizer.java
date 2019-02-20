@@ -45,6 +45,11 @@ public class Authorizer extends CommonEntity {
 	}
 
 	@JsonIgnore
+	public List<Integer> getAccessScopes() {
+		return null;
+	}
+
+	@JsonIgnore
 	@Override
 	public Authorizer getCreator() {
 		return super.getCreator();

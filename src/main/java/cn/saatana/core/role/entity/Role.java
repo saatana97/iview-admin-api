@@ -27,7 +27,7 @@ public class Role extends CommonEntity {
 	@Column(name = "description")
 	private String description;
 	@ManyToMany
-	@JoinTable(name = "role_menu")
+	@JoinTable(name = "r_role_menu")
 	private List<Menu> menus = new ArrayList<>();
 
 	public List<Menu> getMenus() {

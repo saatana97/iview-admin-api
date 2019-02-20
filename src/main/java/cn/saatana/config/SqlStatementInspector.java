@@ -1,16 +1,83 @@
 package cn.saatana.config;
 
-import java.util.logging.Logger;
+import java.util.List;
 
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
+import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLTableSource;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
+import com.alibaba.druid.util.JdbcConstants;
+
+import cn.saatana.core.Safer;
+import cn.saatana.core.auth.entity.AuthorizationInformation;
+
 public class SqlStatementInspector implements StatementInspector {
 	private static final long serialVersionUID = 1L;
-	private final Logger log = Logger.getLogger("SqlStatementInspector");
+	// private final Logger log = Logger.getLogger("SqlStatementInspector");
+
+	/**
+	 * 拼接数据权限SQL
+	 * @param scopes 数据权限范围
+	 * @param tableAliasName 表别名
+	 * @return SQL字符串
+	 */
+	private String generateAccessScopesSql(List<Integer> scopes, String tableAliasName) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(tableAliasName);
+		sb.append(".scope ");
+		if (scopes == null) {
+			sb.append("is null");
+		} else {
+			sb.append("in (");
+			scopes.forEach(item -> {
+				sb.append(item);
+				sb.append(",");
+			});
+			sb.setLength(sb.length() - 1);
+			sb.append(")");
+		}
+		return sb.toString();
+	}
 
 	@Override
 	public String inspect(String sql) {
-		log.info(sql);
+		if (sql.startsWith("select")) {
+			//获取当前登录用户信息
+			AuthorizationInformation authInfo = Safer.currentAuthInfo();
+			if (authInfo != null) {
+				SQLSelectStatement select = (SQLSelectStatement) SQLUtils.parseStatements(sql, JdbcConstants.MYSQL)
+						.get(0);
+				SQLTableSource table = select.getSelect().getQueryBlock().getFrom();
+				//如果是多表查询遍历出主表
+				if (table instanceof SQLJoinTableSource) {
+					do {
+						SQLJoinTableSource join = (SQLJoinTableSource) table;
+						table = join.getLeft();
+					} while (table instanceof SQLJoinTableSource);
+				}
+				//获取Hibernate给表取的别名
+				String tableAliasName = table.computeAlias();
+				//获取真实的表名
+				MySqlSchemaStatVisitor visitor = new MySqlSchemaStatVisitor();
+				select.accept(visitor);
+//				for(Entry<Name, TableStat> entry : visitor.getTables().entrySet()) {
+//					System.out.println(entry.getKey().getName());
+//				}
+				String realTableName = visitor.getAliasMap().get(tableAliasName); 
+				//如果是关联表就不校验数据权限
+				if (!realTableName.startsWith("r_")) {
+					sql = SQLUtils.addCondition(sql,
+							generateAccessScopesSql(authInfo.getAuth().getAccessScopes(), tableAliasName),
+							SQLBinaryOperator.BooleanAnd, true, JdbcConstants.MYSQL);
+				}
+			}
+		}
+		//格式化打印SQL
+		System.out.println(SQLUtils.format(sql, JdbcConstants.MYSQL));
 		return sql;
 	}
 

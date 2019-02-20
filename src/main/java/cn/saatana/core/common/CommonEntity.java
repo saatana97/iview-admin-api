@@ -27,7 +27,7 @@ import cn.saatana.core.auth.entity.Authorizer;
  *
  */
 @MappedSuperclass
-public abstract class CommonEntity extends PageQueryable implements Serializable {
+public abstract class CommonEntity extends PageQueryable implements Serializable, AccessScopeable {
 	private static final long serialVersionUID = 1L;
 	public static final int STATUS_NORMAL = 0;
 	public static final int STATUS_DELETED = 1;
@@ -43,6 +43,8 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Authorizer updator;
 	private int dataStatus = 0;
+	@JsonIgnore
+	private Integer scope;
 
 	public void preCreate() {
 		AuthorizationInformation authInfo = Safer.currentAuthInfo();
@@ -76,6 +78,16 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	@Override
+	public Integer getScope() {
+		return scope;
+	}
+
+	@Override
+	public void setScope(Integer scope) {
+		this.scope = scope;
 	}
 
 	public String getDescription() {
