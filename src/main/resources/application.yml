@@ -12,11 +12,13 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
   jpa:
     properties:
       hibernate:
         session_factory:
           statement_inspector: cn.saatana.config.SqlStatementInspector
+#          statement_inspector: sqlStatementInspector
     open-in-view: true
     show-sql: false
     hibernate:
@@ -27,6 +29,15 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     default-property-inclusion: non-null
+  redis:
+    host: localhost
+    port: 6379
+    database: 1
+    lettuce:
+      pool:
+        max-active: 100
+        max-wait: 10000
+        max-idle: 20 
 app:
   enable-safer: true
   log-request-info: true

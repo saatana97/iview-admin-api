@@ -5,6 +5,9 @@ public class AuthorizationInformation {
 	private String token;
 	private Authorizer auth;
 
+	public AuthorizationInformation() {
+	}
+
 	public AuthorizationInformation(String token, String sessionId, Authorizer auth) {
 		this.token = token;
 		this.sessionId = sessionId;

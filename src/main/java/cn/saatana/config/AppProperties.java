@@ -18,6 +18,18 @@ public class AppProperties {
 	 * 是否允许本地跨域请求
 	 */
 	private boolean allowLocalCrossDomain = true;
+	/**
+	 * TOKEN存活时间，默认5，单位秒
+	 */
+	private long tokenLife = 60l * 5;
+
+	public long getTokenLife() {
+		return tokenLife;
+	}
+
+	public void setTokenLife(long tokenLife) {
+		this.tokenLife = tokenLife;
+	}
 
 	public boolean isAllowLocalCrossDomain() {
 		return allowLocalCrossDomain;

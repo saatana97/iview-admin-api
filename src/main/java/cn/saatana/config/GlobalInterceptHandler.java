@@ -60,6 +60,9 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 				response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
 						textProp.getNoAccessMessage(), textProp.getNoAccessMessage())));
 				result = false;
+			} else {
+				// 刷新token存活时间
+				Safer.restore(Safer.scanToken());
 			}
 		}
 		if (appProp.isLogRequestInfo()) {

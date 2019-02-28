@@ -19,7 +19,7 @@ public class Res<T> {
 	}
 
 	public static <T> Res<T> error(T data) {
-		return of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "操作失败", data);
+		return of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务器异常", data);
 	}
 
 	public static <T> Res<T> error(String message, T data) {

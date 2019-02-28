@@ -1,21 +1,24 @@
 package cn.saatana.core;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.alibaba.fastjson.JSONObject;
+
+import cn.saatana.config.AppProperties;
 import cn.saatana.core.auth.entity.AuthorizationInformation;
 import cn.saatana.core.auth.entity.Authorizer;
+import cn.saatana.core.utils.RedisService;
 
 /**
  * 应用安全类
@@ -25,7 +28,21 @@ import cn.saatana.core.auth.entity.Authorizer;
  */
 @Component
 public class Safer {
-	private static Map<String, AuthorizationInformation> loginInfo = new ConcurrentHashMap<>();
+	private static AppProperties appProp;
+	private static RedisService redis;
+
+	@Autowired
+	public void setRedis(RedisService redis) {
+		Safer.redis = redis;
+	}
+
+	@Autowired
+	public void setAppProp(AppProperties appProp) {
+		Safer.appProp = appProp;
+	}
+
+	// private static Map<String, AuthorizationInformation> loginInfo = new
+	// ConcurrentHashMap<>();
 
 	private static String generateToken() {
 		return UUID.randomUUID().toString().replaceAll("-", "");
@@ -50,6 +67,34 @@ public class Safer {
 	}
 
 	/**
+	 * 重新保存token刷新时间
+	 *
+	 * @param token
+	 * @return
+	 */
+	public static AuthorizationInformation restore(String token) {
+		return restore(token, null);
+	}
+
+	/**
+	 * 刷新token寿命
+	 *
+	 * @param token
+	 * @param auth
+	 * @return
+	 */
+	public static AuthorizationInformation restore(String token, AuthorizationInformation auth) {
+		if (auth == null) {
+			auth = getAuthorizerByToken(token);
+		}
+		redis.remove(token);
+		if (auth != null) {
+			redis.set(token, auth, appProp.getTokenLife());
+		}
+		return auth;
+	}
+
+	/**
 	 * 用户登录
 	 *
 	 * @param user
@@ -61,7 +106,7 @@ public class Safer {
 		HttpServletResponse response = currentResponse();
 		String token = generateToken();
 		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(), user);
-		loginInfo.put(token, userInfo);
+		restore(token, userInfo);
 		Cookie cookie = new Cookie("token", token);
 		cookie.setPath("/");
 		response.addCookie(cookie);
@@ -73,7 +118,7 @@ public class Safer {
 	 */
 	public static void logout() {
 		String token = scanToken();
-		loginInfo.remove(token);
+		redis.remove(token);
 	}
 
 	/**
@@ -82,8 +127,7 @@ public class Safer {
 	 * @return
 	 */
 	public static AuthorizationInformation currentAuthInfo() {
-		String token = scanToken();
-		return loginInfo.get(token);
+		return getAuthorizerByToken(scanToken());
 	}
 
 	/**
@@ -102,12 +146,17 @@ public class Safer {
 
 	/**
 	 * 根据token获取授权信息
-	 * 
+	 *
 	 * @param token
 	 * @return
 	 */
 	public static AuthorizationInformation getAuthorizerByToken(String token) {
-		return loginInfo.get(token);
+		AuthorizationInformation res = null;
+		Object obj = redis.get(token);
+		if (obj != null) {
+			res = ((JSONObject) obj).toJavaObject(AuthorizationInformation.class);
+		}
+		return res;
 	}
 
 	/**

@@ -1,2 +1,3 @@
 app:
   enable-safer: true
+  token-life: 30
