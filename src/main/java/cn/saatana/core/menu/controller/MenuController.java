@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,11 +69,20 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 		return Res.ok(root);
 	}
 
-	@PostMapping("create")
 	@Override
 	public Res<Menu> create(@RequestBody Menu entity, BindingResult result) throws UnsupportedEncodingException {
 		entity.setRouter(buildRouter(entity));
 		return super.create(entity, result);
+	}
+
+	@Override
+	public Res<Menu> update(@RequestBody Menu entity, BindingResult result) {
+		Menu menu = service.get(entity.getId());
+		if (menu.getParent() != null) {
+			entity.setRouter(entity.getRouter().replace(menu.getParent().getRouter(), ""));
+		}
+		entity.setRouter(buildRouter(entity));
+		return super.update(entity, result);
 	}
 
 	/**

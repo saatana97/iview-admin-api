@@ -21,7 +21,6 @@ import cn.saatana.core.org.service.OrgService;
 public class OrgController extends CommonController<OrgService, OrgRepository, Org> {
 	@RequestMapping("tree")
 	public Res<List<Org>> tree() {
-		// TODO 将查询全部组织机构改为查询当前用户有权限查看的组织机构
 		List<Org> all = service.findAll();
 		Map<Integer, Org> map = new HashMap<>();
 		all.forEach(item -> {
@@ -29,9 +28,9 @@ public class OrgController extends CommonController<OrgService, OrgRepository, O
 		});
 		List<Integer> childrenId = new ArrayList<>();
 		all.forEach(item -> {
-			Org parent = item.getParent();
+			Integer parent = item.getParentId();
 			if (parent != null) {
-				parent.getChildren().add(item);
+				map.get(parent).getChildren().add(item);
 				childrenId.add(item.getId());
 			}
 		});

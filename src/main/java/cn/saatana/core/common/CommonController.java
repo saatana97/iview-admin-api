@@ -1,6 +1,7 @@
 package cn.saatana.core.common;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.ValidationException;
 
 import org.springframework.beans.BeanUtils;
@@ -210,28 +213,39 @@ public abstract class CommonController<Service extends CommonService<Repository,
 		List<String> res = new ArrayList<>();
 		Class<?> objClass = classs.length > 0 ? classs[0] : obj.getClass();
 		Arrays.asList(objClass.getDeclaredFields()).forEach(field -> {
-			String name = field.getName();
-			String getterName = "get" + name.substring(0, 1).toUpperCase()
-					+ (name.length() > 1 ? name.substring(1) : "");
-			try {
-				Method getter = objClass.getMethod(getterName);
-				if (Modifier.isPublic(getter.getModifiers())) {
-					Object value = getter.invoke(obj);
-					if (value == null) {
-						res.add(name);
+			if (!isCascsdeField(field)) {
+				String name = field.getName();
+				String getterName = "get" + name.substring(0, 1).toUpperCase()
+						+ (name.length() > 1 ? name.substring(1) : "");
+				try {
+					Method getter = objClass.getMethod(getterName);
+					if (Modifier.isPublic(getter.getModifiers())) {
+						Object value = getter.invoke(obj);
+						if (value == null) {
+							res.add(name);
+						}
 					}
+				} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					log.info(e.getMessage());
+					e.printStackTrace();
 				}
-			} catch (NoSuchMethodException | SecurityException e) {
-
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.info(e.getMessage());
-				e.printStackTrace();
 			}
 		});
 		Class<?> superClass = objClass.getSuperclass();
 		if (superClass != null) {
 			Object superObj = superClass.cast(obj);
 			res.addAll(getPropertiesWithNullValue(superObj, superClass));
+		}
+		return res;
+	}
+
+	private boolean isCascsdeField(Field field) {
+		boolean res = false;
+		if (field.getAnnotation(ManyToOne.class) != null) {
+			res = true;
+		} else if (field.getAnnotation(OneToOne.class) != null) {
+			res = true;
 		}
 		return res;
 	}

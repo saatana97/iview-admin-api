@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import cn.saatana.core.common.AccessScopeable;
 import cn.saatana.core.common.CommonEntity;
@@ -29,8 +30,6 @@ public class Menu extends CommonEntity implements AccessScopeable {
 
 	private String title;
 
-	@JSONField(serialize = false)
-	@JsonIgnore
 	@Where(clause = WHERE_CLAUSE)
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Menu parent;
@@ -77,10 +76,13 @@ public class Menu extends CommonEntity implements AccessScopeable {
 		return res;
 	}
 
+	@JSONField(serialize = false)
+	@JsonIgnore
 	public Menu getParent() {
 		return parent;
 	}
 
+	@JsonProperty
 	public void setParent(Menu parent) {
 		this.parent = parent;
 	}
