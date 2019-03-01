@@ -39,9 +39,7 @@ public class User extends CommonEntity {
 
 	private String email;
 
-	private String sex;
-
-	private String type;
+	private Integer sex;
 
 	private String description;
 
@@ -111,20 +109,12 @@ public class User extends CommonEntity {
 		this.email = email;
 	}
 
-	public String getSex() {
+	public Integer getSex() {
 		return sex;
 	}
 
-	public void setSex(String sex) {
+	public void setSex(Integer sex) {
 		this.sex = sex;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	@Override

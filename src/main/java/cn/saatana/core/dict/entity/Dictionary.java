@@ -12,8 +12,16 @@ public class Dictionary extends CommonEntity {
 	private String type;
 	private String code;
 	private String label;
-	private String value;
+	private Integer value;
 	private Integer sort;
+
+	public Dictionary() {
+	}
+
+	public Dictionary(String code, Integer value) {
+		this.code = code;
+		this.value = value;
+	}
 
 	public String getCode() {
 		return code;
@@ -39,11 +47,11 @@ public class Dictionary extends CommonEntity {
 		this.label = label;
 	}
 
-	public String getValue() {
+	public Integer getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(Integer value) {
 		this.value = value;
 	}
 

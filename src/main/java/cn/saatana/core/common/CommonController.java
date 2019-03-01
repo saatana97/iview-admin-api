@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 import javax.validation.ValidationException;
 
 import org.springframework.beans.BeanUtils;
@@ -213,7 +214,7 @@ public abstract class CommonController<Service extends CommonService<Repository,
 		List<String> res = new ArrayList<>();
 		Class<?> objClass = classs.length > 0 ? classs[0] : obj.getClass();
 		Arrays.asList(objClass.getDeclaredFields()).forEach(field -> {
-			if (!isCascsdeField(field)) {
+			if (!isIgnoreField(field)) {
 				String name = field.getName();
 				String getterName = "get" + name.substring(0, 1).toUpperCase()
 						+ (name.length() > 1 ? name.substring(1) : "");
@@ -234,17 +235,21 @@ public abstract class CommonController<Service extends CommonService<Repository,
 		});
 		Class<?> superClass = objClass.getSuperclass();
 		if (superClass != null) {
-			Object superObj = superClass.cast(obj);
-			res.addAll(getPropertiesWithNullValue(superObj, superClass));
+			// Object superObj = superClass.cast(obj);
+			res.addAll(getPropertiesWithNullValue(obj, superClass));
 		}
 		return res;
 	}
 
-	private boolean isCascsdeField(Field field) {
+	private boolean isIgnoreField(Field field) {
 		boolean res = false;
 		if (field.getAnnotation(ManyToOne.class) != null) {
 			res = true;
 		} else if (field.getAnnotation(OneToOne.class) != null) {
+			res = true;
+		} else if (field.getAnnotation(Transient.class) != null) {
+			res = true;
+		} else if (Modifier.isStatic(field.getModifiers())) {
 			res = true;
 		}
 		return res;

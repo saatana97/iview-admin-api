@@ -15,9 +15,11 @@ import org.hibernate.annotations.Where;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import cn.saatana.core.common.AccessScopeable;
 import cn.saatana.core.common.CommonEntity;
+import cn.saatana.core.utils.DictUtils;
 
 /**
  * 组织机构
@@ -29,15 +31,13 @@ import cn.saatana.core.common.CommonEntity;
 @Table(name = "org")
 public class Org extends CommonEntity implements AccessScopeable {
 	private static final long serialVersionUID = 1L;
-	private String name;
+	private String title;
 
 	private String code;
 
-	private String type;
+	private Integer type;
 
-	private String level;
-	@JSONField(serialize = false)
-	@JsonIgnore
+	private Integer level;
 	@Where(clause = WHERE_CLAUSE)
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Org parent;
@@ -52,6 +52,16 @@ public class Org extends CommonEntity implements AccessScopeable {
 			res = parent.getId();
 		}
 		return res;
+	}
+
+	@JsonGetter
+	public String getTypeLabel() {
+		return DictUtils.query("orgType", type);
+	}
+
+	@JsonGetter
+	public String getLevelLabel() {
+		return DictUtils.query("orgLevel", level);
 	}
 
 	@Override
@@ -70,12 +80,12 @@ public class Org extends CommonEntity implements AccessScopeable {
 		this.scope = scope;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String name) {
+		this.title = name;
 	}
 
 	public String getCode() {
@@ -86,26 +96,29 @@ public class Org extends CommonEntity implements AccessScopeable {
 		this.code = code;
 	}
 
-	public String getType() {
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 
-	public String getLevel() {
+	public Integer getLevel() {
 		return level;
 	}
 
-	public void setLevel(String level) {
+	public void setLevel(Integer level) {
 		this.level = level;
 	}
 
+	@JSONField(serialize = false)
+	@JsonIgnore
 	public Org getParent() {
 		return parent;
 	}
 
+	@JsonProperty
 	public void setParent(Org parent) {
 		this.parent = parent;
 	}
