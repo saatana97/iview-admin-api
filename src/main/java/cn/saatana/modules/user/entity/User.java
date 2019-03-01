@@ -1,11 +1,18 @@
 package cn.saatana.modules.user.entity;
 
+import java.text.NumberFormat;
+import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 import cn.saatana.core.auth.entity.Authorizer;
 import cn.saatana.core.common.CommonEntity;
@@ -20,7 +27,9 @@ public class User extends CommonEntity {
 
 	private String name;
 
-	private String birthday;
+	@DateTimeFormat(pattern = "yyyy年MM月dd日")
+	@JsonFormat(pattern = "yyyy年MM月dd日")
+	private Date birthday;
 
 	private String address;
 
@@ -35,6 +44,16 @@ public class User extends CommonEntity {
 	private String type;
 
 	private String description;
+
+	@JsonGetter
+	public String getAge() {
+		String res = "不详";
+		if (birthday != null) {
+			res = NumberFormat.getIntegerInstance()
+					.format((System.currentTimeMillis() - birthday.getTime()) / 31557600000l) + "周岁";
+		}
+		return res;
+	}
 
 	public Authorizer getAuthorizer() {
 		return authorizer;
@@ -52,11 +71,11 @@ public class User extends CommonEntity {
 		this.name = name;
 	}
 
-	public String getBirthday() {
+	public Date getBirthday() {
 		return birthday;
 	}
 
-	public void setBirthday(String birthday) {
+	public void setBirthday(Date birthday) {
 		this.birthday = birthday;
 	}
 

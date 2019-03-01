@@ -9,10 +9,19 @@ import cn.saatana.core.common.CommonEntity;
 @Table(name = "dict")
 public class Dictionary extends CommonEntity {
 	private static final long serialVersionUID = 1L;
+	private String type;
+	private String code;
 	private String label;
 	private String value;
-	private String type;
 	private Integer sort;
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	public Integer getSort() {
 		return sort;

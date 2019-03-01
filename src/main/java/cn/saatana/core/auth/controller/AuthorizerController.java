@@ -20,7 +20,7 @@ import cn.saatana.core.common.Res;
 import cn.saatana.core.utils.MD5Utils;
 
 @RestController
-@RequestMapping("/authorizer")
+@RequestMapping("/auth")
 @LogOparetion("登陆授权")
 public class AuthorizerController extends CommonController<AuthorizerService, AuthorizerRepository, Authorizer> {
 
