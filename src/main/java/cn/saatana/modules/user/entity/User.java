@@ -1,10 +1,11 @@
 package cn.saatana.modules.user.entity;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
 
 import cn.saatana.core.auth.entity.Authorizer;
 import cn.saatana.core.common.CommonEntity;
@@ -13,6 +14,7 @@ import cn.saatana.core.common.CommonEntity;
 @Table(name = "user")
 public class User extends CommonEntity {
 	private static final long serialVersionUID = 1L;
+	@Where(clause = WHERE_CLAUSE)
 	@OneToOne(cascade = CascadeType.ALL)
 	private Authorizer authorizer;
 
@@ -22,10 +24,8 @@ public class User extends CommonEntity {
 
 	private String address;
 
-	@Column(name = "mobile_phone")
 	private String mobilePhone;
 
-	@Column(name = "tel_phone")
 	private String telPhone;
 
 	private String email;

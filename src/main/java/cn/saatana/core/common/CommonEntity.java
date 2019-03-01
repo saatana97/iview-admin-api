@@ -31,6 +31,7 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 	private static final long serialVersionUID = 1L;
 	public static final int STATUS_NORMAL = 0;
 	public static final int STATUS_DELETED = 1;
+	public static final String WHERE_CLAUSE = "data_status = " + STATUS_NORMAL;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)

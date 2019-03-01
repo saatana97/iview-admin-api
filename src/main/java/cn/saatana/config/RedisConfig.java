@@ -12,6 +12,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 
@@ -66,7 +67,7 @@ public class RedisConfig {
 		// template.setValueSerializer(jackson2JsonRedisSerializer);
 		FastJsonRedisSerializer<Object> json = new FastJsonRedisSerializer<>(Object.class);
 		FastJsonConfig config = new FastJsonConfig();
-		// config.setFeatures(Feature.DisableCircularReferenceDetect);
+		config.setFeatures(Feature.DisableCircularReferenceDetect);
 		json.setFastJsonConfig(config);
 		template.setValueSerializer(json);
 		template.afterPropertiesSet();

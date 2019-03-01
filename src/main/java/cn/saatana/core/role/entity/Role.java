@@ -11,6 +11,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import cn.saatana.core.common.CommonEntity;
@@ -26,6 +28,7 @@ public class Role extends CommonEntity {
 	private String code;
 	@Column(name = "description")
 	private String description;
+	@Where(clause = WHERE_CLAUSE)
 	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	@JoinTable(name = "r_role_menu")
 	private Set<Menu> menus = new HashSet<>();

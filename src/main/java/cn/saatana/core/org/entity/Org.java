@@ -10,6 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Where;
+
 import cn.saatana.core.common.CommonEntity;
 
 /**
@@ -30,6 +32,7 @@ public class Org extends CommonEntity {
 
 	private String level;
 
+	@Where(clause = WHERE_CLAUSE)
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Org parent;
 
