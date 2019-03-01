@@ -2,6 +2,7 @@ package cn.saatana.core.common;
 
 import javax.persistence.Transient;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,21 +14,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public abstract class PageQueryable {
 	@Transient
-	private int index = 1;
+	private int page = 1;
 	@Transient
 	private int limit = 10;
 
 	@JsonIgnore
-	public int getIndex() {
-		return index;
+	@JSONField(serialize = false)
+	public int getPage() {
+		return page;
 	}
 
 	@JsonProperty
-	public void setIndex(int index) {
-		this.index = index;
+	public void setPage(int page) {
+		this.page = page;
 	}
 
 	@JsonIgnore
+	@JSONField(serialize = false)
 	public int getLimit() {
 		return limit;
 	}

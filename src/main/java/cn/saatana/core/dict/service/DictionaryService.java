@@ -24,7 +24,7 @@ public class DictionaryService extends CommonService<DictionaryRepository, Dicti
 				Example.of(entity,
 						ExampleMatcher.matchingAll().withIgnoreNullValues()
 								.withStringMatcher(StringMatcher.CONTAINING)),
-				PageRequest.of(entity.getIndex() - 1, entity.getLimit(), Direction.ASC, "type", "sort", "updateDate",
+				PageRequest.of(entity.getPage() - 1, entity.getLimit(), Direction.ASC, "type", "sort", "updateDate",
 						"createDate"));
 	}
 

@@ -48,7 +48,7 @@ public abstract class CommonService<Repository extends CommonRepository<Entity>,
 				Example.of(entity,
 						ExampleMatcher.matchingAll().withIgnoreNullValues()
 								.withStringMatcher(StringMatcher.CONTAINING)),
-				PageRequest.of(entity.getIndex() - 1, entity.getLimit(), Direction.DESC, "updateDate", "createDate"));
+				PageRequest.of(entity.getPage() - 1, entity.getLimit(), Direction.DESC, "updateDate", "createDate"));
 	}
 
 	/**
