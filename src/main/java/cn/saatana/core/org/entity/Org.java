@@ -1,10 +1,11 @@
 package cn.saatana.core.org.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -29,11 +30,11 @@ public class Org extends CommonEntity {
 
 	private String level;
 
-	@ManyToOne(cascade = CascadeType.REFRESH)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Org parent;
 
 	@Transient
-	private List<Org> children = new ArrayList<>();
+	private Set<Org> children = new HashSet<>();
 
 	public String getName() {
 		return name;
@@ -75,11 +76,11 @@ public class Org extends CommonEntity {
 		this.parent = parent;
 	}
 
-	public List<Org> getChildren() {
+	public Set<Org> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Org> children) {
+	public void setChildren(Set<Org> children) {
 		this.children = children;
 	}
 }

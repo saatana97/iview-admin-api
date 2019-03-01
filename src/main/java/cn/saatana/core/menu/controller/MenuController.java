@@ -3,8 +3,10 @@ package cn.saatana.core.menu.controller;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,12 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.saatana.core.Safer;
 import cn.saatana.core.annotation.LogOparetion;
 import cn.saatana.core.common.CommonController;
 import cn.saatana.core.common.Res;
 import cn.saatana.core.menu.entity.Menu;
 import cn.saatana.core.menu.repository.MenuRepository;
 import cn.saatana.core.menu.service.MenuService;
+import cn.saatana.core.role.entity.Role;
 
 @RestController
 @RequestMapping("/menu")
@@ -32,18 +36,24 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 
 	@RequestMapping("tree")
 	public Res<List<Menu>> tree() {
-		// TODO 将查询全部菜单改为查询当前用户有权限查看的菜单
-		Menu menu = new Menu();
-		List<Menu> all = service.findList(menu);
+		Set<Menu> all = new HashSet<>();
+		if (Safer.isSuperAdmin()) {
+			all.addAll(service.findAll());
+		} else {
+			Set<Role> roles = Safer.currentAuthInfo().getAuth().getRoles();
+			roles.forEach(role -> {
+				all.addAll(role.getMenus());
+			});
+		}
 		Map<Integer, Menu> map = new HashMap<>();
-		all.forEach(item -> {
-			map.put(item.getId(), item);
+		all.forEach(menu -> {
+			map.put(menu.getId(), menu);
 		});
 		List<Integer> childrenId = new ArrayList<>();
 		all.forEach(item -> {
-			Menu parent = item.getParent();
+			Integer parent = item.getParentId();
 			if (parent != null) {
-				parent.getChildren().add(item);
+				map.get(parent).getChildren().add(item);
 				childrenId.add(item.getId());
 			}
 		});

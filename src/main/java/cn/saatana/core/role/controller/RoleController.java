@@ -52,4 +52,5 @@ public class RoleController extends CommonController<RoleService, RoleRepository
 		authService.updateAll(list);
 		return Res.ok(list);
 	}
+
 }

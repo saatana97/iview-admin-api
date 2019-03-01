@@ -47,22 +47,19 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 			if (user == null) {
 				if (StringUtils.isEmpty(Safer.scanToken())) {
 					// 未登录授权的提示语
-					response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
-							textProp.getUnauthorizedMessage(), textProp.getUnauthorizedData())));
+					response.getWriter().println(JSON
+							.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(), textProp.getUnauthorizedMessage(), null)));
 				} else {
 					// 登录信息失效的提示语
-					response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
-							textProp.getInvalidTokenMessage(), textProp.getInvalidTokenData())));
+					response.getWriter().println(JSON
+							.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(), textProp.getInvalidTokenMessage(), null)));
 				}
 				result = false;
-			} else if (needAdmin(handler) && !user.getAuth().getUsername().equals("admin")) {
-				// 需要管理员权限的提示语
+			} else if (needSuperAdmin(handler) && !Safer.isSuperAdmin()) {
+				// 需要超级管理员权限的提示语
 				response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
 						textProp.getNoAccessMessage(), textProp.getNoAccessMessage())));
 				result = false;
-			} else {
-				// 刷新token存活时间
-				Safer.restore(Safer.scanToken());
 			}
 		}
 		if (appProp.isLogRequestInfo()) {
@@ -90,7 +87,7 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 		return result;
 	}
 
-	private boolean needAdmin(Object handler) {
+	private boolean needSuperAdmin(Object handler) {
 		boolean result = false;
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod method = (HandlerMethod) handler;

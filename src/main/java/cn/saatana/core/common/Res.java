@@ -30,14 +30,7 @@ public class Res<T> {
 		return new Res<T>().setData(data).setMessage(message).setStatus(status);
 	}
 
-	public Res() {
-	}
-
-	@Deprecated
-	public Res(T data) {
-		this.data = data;
-		this.status = HttpStatus.OK.value();
-		this.message = "接口调用成功";
+	private Res() {
 	}
 
 	public Date getServiceTime() {

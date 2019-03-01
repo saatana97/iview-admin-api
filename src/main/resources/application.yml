@@ -18,7 +18,6 @@ spring:
       hibernate:
         session_factory:
           statement_inspector: cn.saatana.config.SqlStatementInspector
-#          statement_inspector: sqlStatementInspector
     open-in-view: true
     show-sql: false
     hibernate:

@@ -1,18 +1,18 @@
 package cn.saatana.core.role.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import cn.saatana.core.auth.entity.Authorizer;
 import cn.saatana.core.common.CommonEntity;
 import cn.saatana.core.menu.entity.Menu;
 
@@ -26,15 +26,15 @@ public class Role extends CommonEntity {
 	private String code;
 	@Column(name = "description")
 	private String description;
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	@JoinTable(name = "r_role_menu")
-	private List<Menu> menus = new ArrayList<>();
+	private Set<Menu> menus = new HashSet<>();
 
-	public List<Menu> getMenus() {
+	public Set<Menu> getMenus() {
 		return menus;
 	}
 
-	public void setMenus(List<Menu> menus) {
+	public void setMenus(Set<Menu> menus) {
 		this.menus = menus;
 	}
 
@@ -54,16 +54,6 @@ public class Role extends CommonEntity {
 		this.name = name;
 	}
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
-
-	@Override
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	@JsonGetter
 	public String getMenusName() {
 		StringBuilder sb = new StringBuilder();
@@ -75,17 +65,5 @@ public class Role extends CommonEntity {
 			sb.setLength(sb.length() - 1);
 		}
 		return sb.toString();
-	}
-
-	@JsonIgnore
-	@Override
-	public Authorizer getCreator() {
-		return super.getCreator();
-	}
-
-	@JsonIgnore
-	@Override
-	public Authorizer getUpdator() {
-		return super.getUpdator();
 	}
 }

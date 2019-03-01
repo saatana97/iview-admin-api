@@ -41,9 +41,6 @@ public class Safer {
 		Safer.appProp = appProp;
 	}
 
-	// private static Map<String, AuthorizationInformation> loginInfo = new
-	// ConcurrentHashMap<>();
-
 	private static String generateToken() {
 		return UUID.randomUUID().toString().replaceAll("-", "");
 	}
@@ -69,10 +66,19 @@ public class Safer {
 	/**
 	 * 重新保存token刷新时间
 	 *
+	 * @return
+	 */
+	public static String restore() {
+		return restore(scanToken());
+	}
+
+	/**
+	 * 重新保存token刷新时间
+	 *
 	 * @param token
 	 * @return
 	 */
-	public static AuthorizationInformation restore(String token) {
+	public static String restore(String token) {
 		return restore(token, null);
 	}
 
@@ -83,15 +89,16 @@ public class Safer {
 	 * @param auth
 	 * @return
 	 */
-	public static AuthorizationInformation restore(String token, AuthorizationInformation auth) {
+	public static String restore(String token, AuthorizationInformation auth) {
 		if (auth == null) {
 			auth = getAuthorizerByToken(token);
 		}
-		redis.remove(token);
-		if (auth != null) {
+		if (auth == null) {
+			redis.remove(token);
+		} else {
 			redis.set(token, auth, appProp.getTokenLife());
 		}
-		return auth;
+		return token;
 	}
 
 	/**
@@ -103,13 +110,13 @@ public class Safer {
 	 */
 	public static AuthorizationInformation login(Authorizer user) {
 		HttpServletRequest request = currentRequest();
-		HttpServletResponse response = currentResponse();
 		String token = generateToken();
 		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(), user);
-		restore(token, userInfo);
+		HttpServletResponse response = currentResponse();
 		Cookie cookie = new Cookie("token", token);
 		cookie.setPath("/");
 		response.addCookie(cookie);
+		restore(token, userInfo);
 		return userInfo;
 	}
 
@@ -117,8 +124,16 @@ public class Safer {
 	 * 注销当前用户
 	 */
 	public static void logout() {
-		String token = scanToken();
-		redis.remove(token);
+		redis.remove(currentAuthInfo().getToken());
+	}
+
+	/**
+	 * 判断当前授权者是否为超级管理员
+	 * 
+	 * @return
+	 */
+	public static boolean isSuperAdmin() {
+		return currentAuthId() == 1;
 	}
 
 	/**

@@ -8,8 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import cn.saatana.core.Safer;
 import cn.saatana.core.annotation.LogOparetion;
 import cn.saatana.core.log.entity.OparetionLog;
 import cn.saatana.core.log.service.OparetionLogService;
@@ -50,6 +52,13 @@ public class OparetionLogInterceptHandler extends HandlerInterceptorAdapter {
 			log.fine("记录操作日志：" + oparetionLog.toString());
 		}
 		return result;
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		Safer.restore();
+		super.postHandle(request, response, handler, modelAndView);
 	}
 
 }

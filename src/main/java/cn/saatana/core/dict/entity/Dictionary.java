@@ -12,6 +12,15 @@ public class Dictionary extends CommonEntity {
 	private String label;
 	private String value;
 	private String type;
+	private Integer sort;
+
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
 
 	public String getLabel() {
 		return label;

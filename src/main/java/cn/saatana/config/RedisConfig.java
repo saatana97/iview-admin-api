@@ -2,7 +2,6 @@ package cn.saatana.config;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -13,7 +12,6 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 
@@ -58,10 +56,17 @@ public class RedisConfig {
 	public RedisTemplate<Serializable, Object> redisTemplate(RedisConnectionFactory factory) {
 		RedisTemplate<Serializable, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(factory);
+		// Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new
+		// Jackson2JsonRedisSerializer<>(
+		// Object.class);
+		// ObjectMapper om = new ObjectMapper();
+		// om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		// om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		// jackson2JsonRedisSerializer.setObjectMapper(om);
+		// template.setValueSerializer(jackson2JsonRedisSerializer);
 		FastJsonRedisSerializer<Object> json = new FastJsonRedisSerializer<>(Object.class);
 		FastJsonConfig config = new FastJsonConfig();
-		config.setFeatures(Feature.DisableCircularReferenceDetect);
-		config.setCharset(Charset.forName("UTF-8"));
+		// config.setFeatures(Feature.DisableCircularReferenceDetect);
 		json.setFastJsonConfig(config);
 		template.setValueSerializer(json);
 		template.afterPropertiesSet();

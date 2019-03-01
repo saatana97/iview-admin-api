@@ -12,9 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import cn.saatana.core.Safer;
 import cn.saatana.core.auth.entity.AuthorizationInformation;
@@ -27,7 +27,7 @@ import cn.saatana.core.auth.entity.Authorizer;
  *
  */
 @MappedSuperclass
-public abstract class CommonEntity extends PageQueryable implements Serializable, AccessScopeable {
+public abstract class CommonEntity extends PageQueryable implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final int STATUS_NORMAL = 0;
 	public static final int STATUS_DELETED = 1;
@@ -38,13 +38,20 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 	private String description;
 	private Date createDate;
 	private Date updateDate;
+	@JSONField(serialize = false)
+	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Authorizer creator;
+	@JSONField(serialize = false)
+	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Authorizer updator;
-	private int dataStatus = 0;
+	@JSONField(serialize = false)
 	@JsonIgnore
-	private Integer scope;
+	private int dataStatus = 0;
+	@JSONField(serialize = false)
+	@JsonIgnore
+	protected Integer scope;
 
 	public void preCreate() {
 		AuthorizationInformation authInfo = Safer.currentAuthInfo();
@@ -78,16 +85,6 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	@Override
-	public Integer getScope() {
-		return scope;
-	}
-
-	@Override
-	public void setScope(Integer scope) {
-		this.scope = scope;
 	}
 
 	public String getDescription() {
@@ -130,14 +127,22 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 		this.updateDate = updateDate;
 	}
 
-	@JsonIgnore
 	public int getDataStatus() {
 		return dataStatus;
 	}
 
-	@JsonProperty
 	public void setDataStatus(int dataStatus) {
 		this.dataStatus = dataStatus;
+	}
+
+	@JsonGetter
+	public Integer getCreatorId() {
+		Integer res = null;
+		Authorizer auth = this.getCreator();
+		if (auth != null) {
+			res = auth.getId();
+		}
+		return res;
 	}
 
 	@JsonGetter
@@ -146,6 +151,16 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 		Authorizer auth = this.getCreator();
 		if (auth != null) {
 			res = auth.getUsername();
+		}
+		return res;
+	}
+
+	@JsonGetter
+	public Integer getUpdatorId() {
+		Integer res = null;
+		Authorizer auth = this.getUpdator();
+		if (auth != null) {
+			res = auth.getId();
 		}
 		return res;
 	}

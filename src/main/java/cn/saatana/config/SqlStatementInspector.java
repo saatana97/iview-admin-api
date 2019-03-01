@@ -1,8 +1,9 @@
 package cn.saatana.config;
 
-import java.util.List;
+import java.util.Set;
 
 import org.hibernate.resource.jdbc.spi.StatementInspector;
+import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
@@ -15,23 +16,28 @@ import com.alibaba.druid.util.JdbcConstants;
 import cn.saatana.core.Safer;
 import cn.saatana.core.auth.entity.AuthorizationInformation;
 
+@Configuration
 public class SqlStatementInspector implements StatementInspector {
 	private static final long serialVersionUID = 1L;
 	// private final Logger log = Logger.getLogger("SqlStatementInspector");
 
 	/**
 	 * 拼接数据权限SQL
-	 * @param scopes 数据权限范围
-	 * @param tableAliasName 表别名
+	 *
+	 * @param scopes
+	 *            数据权限范围
+	 * @param tableAliasName
+	 *            表别名
 	 * @return SQL字符串
 	 */
-	private String generateAccessScopesSql(List<Integer> scopes, String tableAliasName) {
+	private String generateAccessScopesSql(Set<Integer> scopes, String tableAliasName) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(tableAliasName);
-		sb.append(".scope ");
-		if (scopes == null) {
-			sb.append("is null");
-		} else {
+		sb.append(".scope is null ");
+		if (scopes != null && scopes.size() > 0) {
+			sb.append("or ");
+			sb.append(tableAliasName);
+			sb.append(".scope ");
 			sb.append("in (");
 			scopes.forEach(item -> {
 				sb.append(item);
@@ -46,39 +52,38 @@ public class SqlStatementInspector implements StatementInspector {
 	@Override
 	public String inspect(String sql) {
 		if (sql.startsWith("select")) {
-			//获取当前登录用户信息
+			// 获取当前登录用户信息
 			AuthorizationInformation authInfo = Safer.currentAuthInfo();
-			if (authInfo != null) {
+			// admin可以看到任何数据
+			if (authInfo != null && authInfo.getAuth().getId() != 1) {
 				SQLSelectStatement select = (SQLSelectStatement) SQLUtils.parseStatements(sql, JdbcConstants.MYSQL)
 						.get(0);
 				SQLTableSource table = select.getSelect().getQueryBlock().getFrom();
-				//如果是多表查询遍历出主表
+				// 如果是多表查询遍历出主表
 				if (table instanceof SQLJoinTableSource) {
 					do {
 						SQLJoinTableSource join = (SQLJoinTableSource) table;
 						table = join.getLeft();
 					} while (table instanceof SQLJoinTableSource);
 				}
-				//获取Hibernate给表取的别名
+				// 获取Hibernate给表取的别名
 				String tableAliasName = table.computeAlias();
-				//获取真实的表名
+				// 获取真实的表名
 				MySqlSchemaStatVisitor visitor = new MySqlSchemaStatVisitor();
 				select.accept(visitor);
-//				for(Entry<Name, TableStat> entry : visitor.getTables().entrySet()) {
-//					System.out.println(entry.getKey().getName());
-//				}
-				String realTableName = visitor.getAliasMap().get(tableAliasName); 
-				//如果是关联表就不校验数据权限
-				if (!realTableName.startsWith("r_")) {
+				// for(Entry<Name, TableStat> entry : visitor.getTables().entrySet()) {
+				// System.out.println(entry.getKey().getName());
+				// }
+				String tableRealName = visitor.getAliasMap().get(tableAliasName);
+				visitor.endVisit(select);
+				// 如果是关联表就不校验数据权限
+				if (!tableRealName.startsWith("r_")) {
 					sql = SQLUtils.addCondition(sql,
 							generateAccessScopesSql(authInfo.getAuth().getAccessScopes(), tableAliasName),
 							SQLBinaryOperator.BooleanAnd, true, JdbcConstants.MYSQL);
 				}
 			}
 		}
-		//格式化打印SQL
-		System.out.println(SQLUtils.format(sql, JdbcConstants.MYSQL));
 		return sql;
 	}
-
 }

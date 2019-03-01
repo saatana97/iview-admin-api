@@ -1,31 +1,31 @@
 package cn.saatana.core.menu.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-import cn.saatana.core.auth.entity.Authorizer;
+import cn.saatana.core.common.AccessScopeable;
 import cn.saatana.core.common.CommonEntity;
 
 @Entity
 @Table(name = "menu")
-public class Menu extends CommonEntity {
+public class Menu extends CommonEntity implements AccessScopeable {
 	private static final long serialVersionUID = 1L;
 
 	private String code;
 
 	private String title;
 
-	@ManyToOne(cascade = CascadeType.REFRESH)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Menu parent;
 
 	private String icon;
@@ -35,13 +35,13 @@ public class Menu extends CommonEntity {
 	private Integer sort;
 
 	@Transient
-	private List<Menu> children = new ArrayList<>();
+	private Set<Menu> children = new HashSet<>();
 
-	public List<Menu> getChildren() {
+	public Set<Menu> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Menu> children) {
+	public void setChildren(Set<Menu> children) {
 		this.children = children;
 	}
 
@@ -70,12 +70,10 @@ public class Menu extends CommonEntity {
 		return res;
 	}
 
-	@JsonIgnore
 	public Menu getParent() {
 		return parent;
 	}
 
-	@JsonProperty
 	public void setParent(Menu parent) {
 		this.parent = parent;
 	}
@@ -104,16 +102,19 @@ public class Menu extends CommonEntity {
 		this.sort = sort;
 	}
 
-	@JsonIgnore
 	@Override
-	public Authorizer getCreator() {
-		return super.getCreator();
+	public Integer getScope() {
+		return this.scope;
 	}
 
-	@JsonIgnore
 	@Override
-	public Authorizer getUpdator() {
-		return super.getUpdator();
+	public void setScope(Integer scope) {
+		this.scope = scope;
 	}
 
+	@Override
+	public String toString() {
+		// return "{title:" + title + ", id:" + getId() + "}";
+		return JSONObject.toJSONString(this);
+	}
 }

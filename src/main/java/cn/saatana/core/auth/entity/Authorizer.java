@@ -1,8 +1,8 @@
 package cn.saatana.core.auth.entity;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,13 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import cn.saatana.core.common.CommonEntity;
-import cn.saatana.core.menu.entity.Menu;
 import cn.saatana.core.role.entity.Role;
 
 @Entity
@@ -29,12 +28,10 @@ public class Authorizer extends CommonEntity {
 	private String password;
 	@Column(name = "login_date")
 	private Date loginDate;
-	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	@JoinTable(name = "r_user_role", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "role_id") })
-	private List<Role> roles = new ArrayList<>();
-	@Transient
-	private List<Menu> menus = new ArrayList<>();
+	private Set<Role> roles = new HashSet<>();
 
 	public Authorizer() {
 	}
@@ -44,36 +41,18 @@ public class Authorizer extends CommonEntity {
 		this.password = password;
 	}
 
+	@JSONField(serialize = false)
 	@JsonIgnore
-	public List<Integer> getAccessScopes() {
-		return null;
+	public Set<Integer> getAccessScopes() {
+		Set<Integer> res = new HashSet<>();
+		return res;
 	}
 
-	@JsonIgnore
-	@Override
-	public Authorizer getCreator() {
-		return super.getCreator();
-	}
-
-	@JsonIgnore
-	@Override
-	public Authorizer getUpdator() {
-		return super.getUpdator();
-	}
-
-	public List<Menu> getMenus() {
-		return menus;
-	}
-
-	public void setMenus(List<Menu> menus) {
-		this.menus = menus;
-	}
-
-	public List<Role> getRoles() {
+	public Set<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(List<Role> roles) {
+	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
 
@@ -85,11 +64,13 @@ public class Authorizer extends CommonEntity {
 		this.username = username;
 	}
 
+	@JSONField(serialize = false)
 	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JSONField(serialize = true)
 	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;

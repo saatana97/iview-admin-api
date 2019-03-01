@@ -39,6 +39,7 @@ public class RedisService {
 	 * @param value
 	 * @return
 	 */
+	@Deprecated
 	public boolean set(final String key, Object value) {
 		boolean result = false;
 		try {
