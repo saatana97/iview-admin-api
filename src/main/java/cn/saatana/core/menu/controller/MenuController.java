@@ -41,9 +41,13 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 			all.addAll(service.findAll());
 		} else {
 			Set<Role> roles = Safer.currentAuthInfo().getAuth().getRoles();
+			List<Integer> menuIds = new ArrayList<>();
 			roles.forEach(role -> {
-				all.addAll(role.getMenus());
+				role.getMenus().forEach(menu -> {
+					menuIds.add(menu.getId());
+				});
 			});
+			all.addAll(service.findAllByIds(menuIds));
 		}
 		Map<Integer, Menu> map = new HashMap<>();
 		all.forEach(menu -> {

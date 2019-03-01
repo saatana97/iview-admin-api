@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import cn.saatana.config.AppProperties;
 import cn.saatana.core.auth.entity.AuthorizationInformation;
 import cn.saatana.core.auth.entity.Authorizer;
+import cn.saatana.core.auth.service.AuthorizerService;
 import cn.saatana.core.utils.RedisService;
 
 /**
@@ -30,6 +31,12 @@ import cn.saatana.core.utils.RedisService;
 public class Safer {
 	private static AppProperties appProp;
 	private static RedisService redis;
+	private static AuthorizerService authService;
+
+	@Autowired
+	public void setAuthService(AuthorizerService authService) {
+		this.authService = authService;
+	}
 
 	@Autowired
 	public void setRedis(RedisService redis) {
@@ -96,6 +103,7 @@ public class Safer {
 		if (auth == null) {
 			redis.remove(token);
 		} else {
+			auth.setAuth(authService.get(auth.getAuth().getId()));
 			redis.set(token, auth, appProp.getTokenLife());
 		}
 		return token;
@@ -129,7 +137,7 @@ public class Safer {
 
 	/**
 	 * 判断当前授权者是否为超级管理员
-	 * 
+	 *
 	 * @return
 	 */
 	public static boolean isSuperAdmin() {

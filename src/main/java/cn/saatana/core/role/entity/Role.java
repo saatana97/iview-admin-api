@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -29,6 +30,7 @@ public class Role extends CommonEntity {
 	@Column(name = "description")
 	private String description;
 	@Where(clause = WHERE_CLAUSE)
+	@OrderBy("sort,title")
 	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	@JoinTable(name = "r_role_menu")
 	private Set<Menu> menus = new HashSet<>();
