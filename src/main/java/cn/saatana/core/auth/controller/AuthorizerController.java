@@ -1,10 +1,7 @@
 package cn.saatana.core.auth.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,34 +18,11 @@ import cn.saatana.core.auth.service.AuthorizerService;
 import cn.saatana.core.common.CommonController;
 import cn.saatana.core.common.Res;
 import cn.saatana.core.utils.MD5Utils;
-import cn.saatana.core.utils.RedisService;
 
 @RestController
 @RequestMapping("/authorizer")
 @LogOparetion("登陆授权")
 public class AuthorizerController extends CommonController<AuthorizerService, AuthorizerRepository, Authorizer> {
-	@Autowired
-	private RedisService redis;
-
-	@Guest
-	@RequestMapping("redis")
-	public String redisTest(String str) throws ParseException {
-		String res = "";
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,sss");
-		if (redis.exists(str)) {
-			System.out.println("获取缓存");
-			res = (String) redis.get(str);
-			if (System.currentTimeMillis() - sdf.parse(res).getTime() > 30000) {
-				System.out.println("清空缓存");
-				redis.remove(str);
-			}
-		} else {
-			System.out.println("更新缓存");
-			res = sdf.format(new Date());
-			redis.set(str, res);
-		}
-		return res;
-	}
 
 	@Guest
 	@PostMapping("login")

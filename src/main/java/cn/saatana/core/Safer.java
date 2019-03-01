@@ -35,7 +35,7 @@ public class Safer {
 
 	@Autowired
 	public void setAuthService(AuthorizerService authService) {
-		this.authService = authService;
+		Safer.authService = authService;
 	}
 
 	@Autowired
