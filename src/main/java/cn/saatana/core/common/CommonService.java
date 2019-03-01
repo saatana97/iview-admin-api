@@ -70,8 +70,22 @@ public abstract class CommonService<Repository extends CommonRepository<Entity>,
 	 */
 	@Transactional(readOnly = true)
 	public List<Entity> findList(Entity entity) {
+		return findList(entity, StringMatcher.CONTAINING);
+	}
+
+	/**
+	 * 根据条件查询数据，默认只查询数据状态正常（STATUS_NORMAL）的数据
+	 *
+	 * @param entity
+	 *            查询条件
+	 * @param stringMatcher
+	 *            字符串匹配模式
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public List<Entity> findList(Entity entity, StringMatcher stringMatcher) {
 		return repository.findAll(Example.of(entity,
-				ExampleMatcher.matchingAll().withIgnoreNullValues().withStringMatcher(StringMatcher.CONTAINING)));
+				ExampleMatcher.matchingAll().withIgnoreNullValues().withStringMatcher(stringMatcher)));
 	}
 
 	/**

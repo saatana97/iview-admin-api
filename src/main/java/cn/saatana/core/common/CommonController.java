@@ -17,6 +17,7 @@ import javax.validation.ValidationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -54,6 +55,12 @@ public abstract class CommonController<Service extends CommonService<Repository,
 	@PostMapping("list")
 	public Res<List<Entity>> list(@RequestBody Entity entity) {
 		return Res.ok(service.findList(entity));
+	}
+
+	@LogOparetion("重复校验")
+	@RequestMapping("check")
+	public Res<List<Entity>> check(@RequestBody Entity entity) {
+		return Res.ok(service.findList(entity, StringMatcher.EXACT));
 	}
 
 	@LogOparetion("列表查询")
