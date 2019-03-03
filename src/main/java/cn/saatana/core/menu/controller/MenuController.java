@@ -2,10 +2,8 @@ package cn.saatana.core.menu.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.validation.BindingResult;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.saatana.core.Safer;
+import cn.saatana.core.annotation.HasPermission;
 import cn.saatana.core.annotation.LogOparetion;
 import cn.saatana.core.common.CommonController;
 import cn.saatana.core.common.Res;
@@ -21,9 +20,12 @@ import cn.saatana.core.menu.entity.Menu;
 import cn.saatana.core.menu.repository.MenuRepository;
 import cn.saatana.core.menu.service.MenuService;
 import cn.saatana.core.role.entity.Role;
+import cn.saatana.core.utils.TreeUtils;
+import cn.saatana.core.utils.tree.TreeNode;
 
 @RestController
 @RequestMapping("/menu")
+@HasPermission("menuManager")
 @LogOparetion("菜单管理")
 public class MenuController extends CommonController<MenuService, MenuRepository, Menu> {
 
@@ -34,7 +36,7 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 	}
 
 	@RequestMapping("tree")
-	public Res<List<Menu>> tree() {
+	public Res<List<TreeNode<Menu>>> tree() {
 		Set<Menu> all = new HashSet<>();
 		if (Safer.isSuperAdmin()) {
 			all.addAll(service.findAll());
@@ -48,28 +50,11 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 			});
 			all.addAll(service.findAllByIds(menuIds));
 		}
-		Map<Integer, Menu> map = new HashMap<>();
-		all.forEach(menu -> {
-			map.put(menu.getId(), menu);
-		});
-		List<Integer> childrenId = new ArrayList<>();
-		all.forEach(item -> {
-			Integer parent = item.getParentId();
-			if (parent != null) {
-				map.get(parent).getChildren().add(item);
-				childrenId.add(item.getId());
-			}
-		});
-		List<Menu> root = new ArrayList<>();
-		map.forEach((key, value) -> {
-			if (!childrenId.contains(key)) {
-				root.add(value);
-			}
-		});
-		return Res.ok(root);
+		return Res.ok(TreeUtils.buildTree(all));
 	}
 
 	@Override
+	@HasPermission("addMenu")
 	public Res<Menu> create(@RequestBody Menu entity, BindingResult result) throws UnsupportedEncodingException {
 		entity.setRouter(buildRouter(entity));
 		return super.create(entity, result);

@@ -18,7 +18,7 @@ import com.alibaba.fastjson.JSON;
 import cn.saatana.core.Safer;
 import cn.saatana.core.annotation.Admin;
 import cn.saatana.core.annotation.Guest;
-import cn.saatana.core.auth.entity.AuthorizationInformation;
+import cn.saatana.core.annotation.HasPermission;
 import cn.saatana.core.common.Res;
 import cn.saatana.core.utils.IPUtils;
 
@@ -43,8 +43,8 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 		response.setCharacterEncoding("UTF-8");
 		// 判断是否启用了权限系统，判断当前访问的资源是否需要登陆授权
 		if (appProp.isEnableSafer() && needAuthorized(handler)) {
-			AuthorizationInformation user = Safer.currentAuthInfo();
-			if (user == null) {
+			Integer authId = Safer.currentAuthId();
+			if (authId == null) {
 				if (StringUtils.isEmpty(Safer.scanToken())) {
 					// 未登录授权的提示语
 					response.getWriter().println(JSON
@@ -55,18 +55,43 @@ public class GlobalInterceptHandler extends HandlerInterceptorAdapter {
 							.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(), textProp.getInvalidTokenMessage(), null)));
 				}
 				result = false;
-			} else if (needSuperAdmin(handler) && !Safer.isSuperAdmin()) {
-				// 需要超级管理员权限的提示语
+			} else if ((needSuperAdmin(handler) && !Safer.isSuperAdmin()) || !hasPersisson(handler, authId)) {
+				// 没有访问权限的提示语
 				response.getWriter().println(JSON.toJSON(Res.of(HttpStatus.UNAUTHORIZED.value(),
 						textProp.getNoAccessMessage(), textProp.getNoAccessMessage())));
 				result = false;
 			}
 		}
-		if (appProp.isLogRequestInfo()) {
-			// 记录请求信息
+		if (result && appProp.isLogRequestInfo()) {
+			// 授权通过就记录请求信息
 			logRequestInfo(request, result);
 		}
 		return result;
+	}
+
+	private boolean hasPersisson(Object handler, Integer authId) {
+		boolean result = authId == 1;
+		if (!result && handler instanceof HandlerMethod) {
+			HandlerMethod method = (HandlerMethod) handler;
+			Class<?> controller = method.getBeanType();
+			HasPermission canno = controller.getAnnotation(HasPermission.class);
+			HasPermission manno = method.getMethodAnnotation(HasPermission.class);
+			if (canno != null && !StringUtils.isEmpty(canno.value())) {
+				// 控制器指定了权限
+				result = Safer.hasPermission(authId, canno.value(), canno.logic());
+			}
+			if (manno != null && !StringUtils.isEmpty(manno.value())) {
+				// 方法指定了权限
+				result = Safer.hasPermission(authId, manno.value(), manno.logic());
+			}
+			if ((canno == null || StringUtils.isEmpty(canno.value()))
+					&& (manno == null || StringUtils.isEmpty(manno.value()))) {
+				// 都没有指定权限
+				result = true;
+			}
+		}
+		return result;
+
 	}
 
 	private boolean needAuthorized(Object handler) {

@@ -1,6 +1,9 @@
 package cn.saatana.core;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
@@ -16,6 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.saatana.config.AppProperties;
+import cn.saatana.core.annotation.HasPermission.PermissionLogic;
 import cn.saatana.core.auth.entity.AuthorizationInformation;
 import cn.saatana.core.auth.entity.Authorizer;
 import cn.saatana.core.auth.service.AuthorizerService;
@@ -114,7 +118,7 @@ public class Safer {
 	 *
 	 * @param user
 	 *            用户
-	 * @return token
+	 * @return 用户登录信息
 	 */
 	public static AuthorizationInformation login(Authorizer user) {
 		HttpServletRequest request = currentRequest();
@@ -126,6 +130,61 @@ public class Safer {
 		response.addCookie(cookie);
 		restore(token, userInfo);
 		return userInfo;
+	}
+
+	/**
+	 * 判断当前登录授权者是否拥有指定权限
+	 *
+	 * @param permission
+	 *            权限，多个用,隔开
+	 * @param logic
+	 *            存在多个权限时的检验逻辑
+	 * @return 是否拥有
+	 */
+	public static boolean hasPermission(String permission, PermissionLogic logic) {
+		return hasPermission(currentAuthId(), permission, logic);
+	}
+
+	/**
+	 * 判断指定ID的授权者是否拥有指定权限
+	 *
+	 * @param authId
+	 *            授权者ID
+	 * @param permission
+	 *            权限，多个用,隔开
+	 * @param logic
+	 *            存在多个权限时的检验逻辑
+	 * @return 是否拥有
+	 */
+	public static boolean hasPermission(Integer authId, String permission, PermissionLogic logic) {
+		boolean res = false;
+		if (StringUtils.isEmpty(permission)) {
+			res = true;
+		} else {
+			Authorizer auth = authService.get(authId);
+			if (auth.getRoles() != null) {
+				Set<String> has = new HashSet<>();
+				List<String> need = Arrays.asList(permission.split(","));
+				auth.getRoles().forEach(role -> {
+					role.getMenus().forEach(menu -> {
+						has.addAll(Arrays.asList(menu.getPermission().split(",")));
+					});
+				});
+				if (need.size() == 1) {
+					res = has.contains(need.get(0));
+				} else if (logic == PermissionLogic.ALL) {
+					res = has.containsAll(need);
+				} else if (logic == PermissionLogic.ANY) {
+					for (String item : need) {
+						res |= has.contains(item);
+						if (res) {
+							break;
+						}
+					}
+				}
+			}
+		}
+		return res;
 	}
 
 	/**
@@ -159,7 +218,7 @@ public class Safer {
 	 * @return
 	 */
 	public static Integer currentAuthId() {
-		Integer res = 0;
+		Integer res = null;
 		AuthorizationInformation authInfo = currentAuthInfo();
 		if (authInfo != null) {
 			res = authInfo.getAuth().getId();

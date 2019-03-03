@@ -9,7 +9,7 @@ public class TextProperties {
 	/**
 	 * 未登录授权的提示语
 	 */
-	private String unauthorizedMessage = "请登录后再尝试访问本资源";
+	private String unauthorizedMessage = "请登录后再尝试访问当前资源";
 	/**
 	 * 登录信息失效的提示语
 	 */
@@ -17,7 +17,7 @@ public class TextProperties {
 	/**
 	 * 无权访问的提示语
 	 */
-	private String noAccessMessage = "无权访问";
+	private String noAccessMessage = "你无权访问当前资源";
 
 	public String getUnauthorizedMessage() {
 		return unauthorizedMessage;

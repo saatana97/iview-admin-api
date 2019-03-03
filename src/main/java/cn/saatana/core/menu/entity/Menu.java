@@ -1,7 +1,9 @@
 package cn.saatana.core.menu.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -18,12 +20,13 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import cn.saatana.core.common.AccessScopeable;
 import cn.saatana.core.common.CommonEntity;
+import cn.saatana.core.utils.tree.TreeNode;
+import cn.saatana.core.utils.tree.Treeable;
 
 @Entity
 @Table(name = "menu")
-public class Menu extends CommonEntity implements AccessScopeable {
+public class Menu extends CommonEntity implements Treeable<Menu> {
 	private static final long serialVersionUID = 1L;
 
 	private String code;
@@ -40,14 +43,74 @@ public class Menu extends CommonEntity implements AccessScopeable {
 
 	private Integer sort;
 
-	@Transient
-	private Set<Menu> children = new HashSet<>();
+	private Boolean display;
 
-	public Set<Menu> getChildren() {
+	private String permission;
+
+	@Transient
+	private List<Menu> children = new ArrayList<>();
+
+	@Override
+	public String toString() {
+		return JSONObject.toJSONString(this);
+	}
+
+	@Override
+	public TreeNode<Menu> convertToTreeNode() {
+		return new TreeNode<>(getId() + "", getTitle(), getParentId(), this, getSort(), true, false);
+	}
+
+	@Override
+	public String uniqueCode() {
+		return this.getId() + "";
+	}
+
+	@Override
+	public void formatChildren(Collection<Menu> children) {
+		this.setChildren(children.parallelStream().collect(Collectors.toList()));
+	}
+
+	@JsonGetter
+	public String getParentId() {
+		String res = null;
+		if (parent != null) {
+			res = parent.getId() + "";
+		}
+		return res;
+	}
+
+	@JSONField(serialize = false)
+	@JsonIgnore
+	public Menu getParent() {
+		return parent;
+	}
+
+	@JsonProperty
+	public void setParent(Menu parent) {
+		this.parent = parent;
+	}
+
+	public Boolean getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(Boolean display) {
+		this.display = display;
+	}
+
+	public String getPermission() {
+		return permission;
+	}
+
+	public void setPermission(String permission) {
+		this.permission = permission;
+	}
+
+	public List<Menu> getChildren() {
 		return children;
 	}
 
-	public void setChildren(Set<Menu> children) {
+	public void setChildren(List<Menu> children) {
 		this.children = children;
 	}
 
@@ -65,26 +128,6 @@ public class Menu extends CommonEntity implements AccessScopeable {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	@JsonGetter
-	public Integer getParentId() {
-		Integer res = null;
-		if (parent != null) {
-			res = parent.getId();
-		}
-		return res;
-	}
-
-	@JSONField(serialize = false)
-	@JsonIgnore
-	public Menu getParent() {
-		return parent;
-	}
-
-	@JsonProperty
-	public void setParent(Menu parent) {
-		this.parent = parent;
 	}
 
 	public String getIcon() {
@@ -109,21 +152,5 @@ public class Menu extends CommonEntity implements AccessScopeable {
 
 	public void setSort(Integer sort) {
 		this.sort = sort;
-	}
-
-	@Override
-	public Integer getScope() {
-		return this.scope;
-	}
-
-	@Override
-	public void setScope(Integer scope) {
-		this.scope = scope;
-	}
-
-	@Override
-	public String toString() {
-		// return "{title:" + title + ", id:" + getId() + "}";
-		return JSONObject.toJSONString(this);
 	}
 }
