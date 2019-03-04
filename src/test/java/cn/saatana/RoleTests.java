@@ -22,6 +22,11 @@ public class RoleTests {
 	private AuthorizerService authService;
 
 	@Test
+	public void accessScopeTest() {
+		Authorizer auth = authService.get(7);
+		System.out.println(auth.getAccessScopes());
+	}
+
 	public void cascadeTest() {
 		roleService.findPage(new Role()).getContent().forEach(role -> {
 			System.out.println("分页查询出来的角色的菜单\t" + role.getMenusName());

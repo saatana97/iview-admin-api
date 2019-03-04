@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -22,7 +23,7 @@ import cn.saatana.core.common.CommonEntity;
 public class User extends CommonEntity {
 	private static final long serialVersionUID = 1L;
 	@Where(clause = WHERE_CLAUSE)
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Authorizer authorizer;
 
 	private String name;

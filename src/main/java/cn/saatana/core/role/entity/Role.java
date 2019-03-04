@@ -4,9 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
@@ -34,6 +37,18 @@ public class Role extends CommonEntity {
 	@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	@JoinTable(name = "r_role_menu")
 	private Set<Menu> menus = new HashSet<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "r_role_scope", joinColumns = { @JoinColumn(name = "role_id") })
+	@Column(name = "scope")
+	private Set<Integer> accessScopes = new HashSet<>();
+
+	public Set<Integer> getAccessScopes() {
+		return accessScopes;
+	}
+
+	public void setAccessScopes(Set<Integer> accessScopes) {
+		this.accessScopes = accessScopes;
+	}
 
 	public Set<Menu> getMenus() {
 		return menus;

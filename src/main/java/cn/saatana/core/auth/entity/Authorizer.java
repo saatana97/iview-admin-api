@@ -44,11 +44,14 @@ public class Authorizer extends CommonEntity {
 		this.password = password;
 	}
 
-	@JSONField(serialize = false)
 	@JsonIgnore
+	@JSONField(serialize = false)
 	public Set<Integer> getAccessScopes() {
-		Set<Integer> res = new HashSet<>();
-		return res;
+		Set<Integer> scopes = new HashSet<>();
+		getRoles().forEach(role -> {
+			scopes.addAll(role.getAccessScopes());
+		});
+		return scopes;
 	}
 
 	public Set<Role> getRoles() {
@@ -86,4 +89,5 @@ public class Authorizer extends CommonEntity {
 	public void setLoginDate(Date loginDate) {
 		this.loginDate = loginDate;
 	}
+
 }

@@ -121,14 +121,15 @@ public class Safer {
 	/**
 	 * 用户登录
 	 *
-	 * @param user
+	 * @param auth
 	 *            用户
 	 * @return 用户登录信息
 	 */
-	public static AuthorizationInformation login(Authorizer user) {
+	public static AuthorizationInformation login(Authorizer auth) {
 		HttpServletRequest request = currentRequest();
 		String token = generateToken();
-		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(), user);
+		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(),
+				auth);
 		HttpServletResponse response = currentResponse();
 		Cookie cookie = new Cookie("token", token);
 		cookie.setPath("/");

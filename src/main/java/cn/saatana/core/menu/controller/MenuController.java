@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -43,9 +44,8 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 	@RequestMapping("tree")
 	public Res<List<TreeNode<Menu>>> tree() {
 		Set<Menu> all = new HashSet<>();
-		if (Safer.isSuperAdmin()) {
-			all.addAll(service.findAll());
-		} else {
+		all.addAll(service.findAll());
+		if (!Safer.isSuperAdmin()) {
 			Set<Role> roles = Safer.currentAuthInfo().getAuth().getRoles();
 			List<Integer> menuIds = new ArrayList<>();
 			roles.forEach(role -> {
@@ -53,7 +53,9 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 					menuIds.add(menu.getId());
 				});
 			});
-			all.addAll(service.findAllByIds(menuIds));
+			all = all.parallelStream().filter(item -> {
+				return menuIds.contains(item.getId());
+			}).collect(Collectors.toSet());
 		}
 		List<TreeNode<Menu>> tree = TreeUtils.buildTree(all);
 		return Res.ok(tree);

@@ -29,6 +29,7 @@ public class AuthorizerController extends CommonController<AuthorizerService, Au
 	@LogOparetion("登陆")
 	public Res<AuthorizationInformation> login(@RequestBody Authorizer user) {
 		Authorizer entity = service.getByUsername(user.getUsername());
+		System.out.println(entity.getAccessScopes());
 		if (user.getPassword() != null) {
 			if (user.getPassword().length() < 32) {
 				user.setPassword(MD5Utils.encode(user.getPassword()));

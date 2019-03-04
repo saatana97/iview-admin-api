@@ -6,6 +6,7 @@ import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
 import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
@@ -76,8 +77,14 @@ public class SqlStatementInspector implements StatementInspector {
 				// }
 				String tableRealName = visitor.getAliasMap().get(tableAliasName);
 				visitor.endVisit(select);
-				// 如果是关联表就不校验数据权限
-				if (!tableRealName.startsWith("r_")) {
+				boolean isPrimaryKeyQuery = false;
+				SQLExpr where = select.getSelect().getQueryBlock().getWhere();
+				if (where != null) {
+					where.accept(visitor);
+					isPrimaryKeyQuery = visitor.containsColumn(tableRealName, "id");
+				}
+				// 如果是关联表或者是主键查询就不校验数据权限
+				if (!tableRealName.startsWith("r_") && !isPrimaryKeyQuery) {
 					sql = SQLUtils.addCondition(sql,
 							generateAccessScopesSql(authInfo.getAuth().getAccessScopes(), tableAliasName),
 							SQLBinaryOperator.BooleanAnd, true, JdbcConstants.MYSQL);
