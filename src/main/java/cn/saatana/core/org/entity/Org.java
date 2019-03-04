@@ -1,7 +1,7 @@
 package cn.saatana.core.org.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import cn.saatana.core.common.AccessScopeable;
 import cn.saatana.core.common.CommonEntity;
 import cn.saatana.core.utils.DictUtils;
+import cn.saatana.core.utils.tree.TreeNode;
+import cn.saatana.core.utils.tree.Treeable;
 
 /**
  * 组织机构
@@ -29,7 +31,7 @@ import cn.saatana.core.utils.DictUtils;
  */
 @Entity
 @Table(name = "org")
-public class Org extends CommonEntity implements AccessScopeable {
+public class Org extends CommonEntity implements Treeable<Org>, AccessScopeable {
 	private static final long serialVersionUID = 1L;
 	private String title;
 
@@ -43,13 +45,28 @@ public class Org extends CommonEntity implements AccessScopeable {
 	private Org parent;
 
 	@Transient
-	private Set<Org> children = new HashSet<>();
+	private List<Org> children = new ArrayList<>();
+
+	@Override
+	public TreeNode<Org> convertToTreeNode() {
+		return new TreeNode<>(getId() + "", getTitle(), getParentId(), this, 0, true, false);
+	}
+
+	@Override
+	public void formatChildren(List<Org> children) {
+		this.setChildren(children);
+	}
+
+	@Override
+	public String uniqueCode() {
+		return getId() + "";
+	}
 
 	@JsonGetter
-	public Integer getParentId() {
-		Integer res = null;
+	public String getParentId() {
+		String res = null;
 		if (parent != null) {
-			res = parent.getId();
+			res = parent.getId() + "";
 		}
 		return res;
 	}
@@ -123,11 +140,11 @@ public class Org extends CommonEntity implements AccessScopeable {
 		this.parent = parent;
 	}
 
-	public Set<Org> getChildren() {
+	public List<Org> getChildren() {
 		return children;
 	}
 
-	public void setChildren(Set<Org> children) {
+	public void setChildren(List<Org> children) {
 		this.children = children;
 	}
 

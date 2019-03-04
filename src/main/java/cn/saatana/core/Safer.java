@@ -108,7 +108,12 @@ public class Safer {
 			redis.remove(token);
 		} else {
 			auth.setAuth(authService.get(auth.getAuth().getId()));
-			redis.set(token, auth, appProp.getTokenLife());
+			long life = appProp.getTokenLife();
+			if (life < 30l) {
+				redis.set(token, auth);
+			} else {
+				redis.set(token, auth, appProp.getTokenLife());
+			}
 		}
 		return token;
 	}

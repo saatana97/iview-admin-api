@@ -1,9 +1,7 @@
 package cn.saatana.core.menu.entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -66,8 +64,8 @@ public class Menu extends CommonEntity implements Treeable<Menu> {
 	}
 
 	@Override
-	public void formatChildren(Collection<Menu> children) {
-		this.setChildren(children.parallelStream().collect(Collectors.toList()));
+	public void formatChildren(List<Menu> children) {
+		this.setChildren(children);
 	}
 
 	@JsonGetter

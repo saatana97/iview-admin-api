@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,7 @@ import cn.saatana.core.menu.entity.Menu;
 import cn.saatana.core.menu.repository.MenuRepository;
 import cn.saatana.core.menu.service.MenuService;
 import cn.saatana.core.role.entity.Role;
+import cn.saatana.core.role.service.RoleService;
 import cn.saatana.core.utils.TreeUtils;
 import cn.saatana.core.utils.tree.TreeNode;
 
@@ -28,6 +31,8 @@ import cn.saatana.core.utils.tree.TreeNode;
 @HasPermission("menuManager")
 @LogOparetion("菜单管理")
 public class MenuController extends CommonController<MenuService, MenuRepository, Menu> {
+	@Autowired
+	private RoleService roleService;
 
 	@RequestMapping("menuAll")
 	@Override
@@ -50,7 +55,30 @@ public class MenuController extends CommonController<MenuService, MenuRepository
 			});
 			all.addAll(service.findAllByIds(menuIds));
 		}
-		return Res.ok(TreeUtils.buildTree(all));
+		List<TreeNode<Menu>> tree = TreeUtils.buildTree(all);
+		return Res.ok(tree);
+	}
+
+	@RequestMapping("tree/{roleId}")
+	public Res<List<TreeNode<Menu>>> roleMenuTree(@PathVariable(required = true) Integer roleId) {
+		List<TreeNode<Menu>> data = tree().getData();
+		Set<Menu> menus = null;
+		Role role = roleService.get(roleId);
+		if (role != null) {
+			menus = role.getMenus();
+		}
+		if (menus != null) {
+			Set<Integer> menuIds = new HashSet<>();
+			menus.forEach(menu -> {
+				menuIds.add(menu.getId());
+			});
+			TreeUtils.forEachTree(data, (parent, child) -> {
+				if (child.getChildren() == null || child.getChildren().size() == 0) {
+					child.setChecked(menuIds.contains(child.getData().getId()));
+				}
+			});
+		}
+		return Res.ok(data);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
@@ -27,6 +26,48 @@ public class TreeUtils {
 	private static Map<Integer, List> buildTreeCache = new ConcurrentHashMap<>();
 	@SuppressWarnings("rawtypes")
 	private static Map<String, List> formatTreeCache = new ConcurrentHashMap<>();
+
+	/**
+	 * 遍历树结构所有节点并执行指定操作
+	 *
+	 * @param tree
+	 *            树结构数据
+	 * @param getChildren
+	 *            树节点获取子节点的方法，入参为父节点
+	 * @param consumer
+	 *            要对树节点进行的操作，第一个入参为父节点，第二个入参为子节点
+	 * @param root
+	 *            方法内部用，调用时传入什么根节点的操作函数第一个入参就是什么
+	 * @return 遍历节点总数
+	 */
+	public static <T> int forEachTree(List<T> tree, Function<T, List<T>> getChildren, BiConsumer<T, T> consumer,
+			T root) {
+		int count = 0;
+		if (tree != null && getChildren != null && consumer != null) {
+			for (T node : tree) {
+				consumer.accept(root, node);
+				List<T> children = getChildren.apply(node);
+				count += forEachTree(children, getChildren, consumer, node);
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * 遍历树结构所有节点并执行指定操作
+	 *
+	 * @param tree
+	 *            树结构数据
+	 * @param consumer
+	 *            要对树节点进行的操作，第一个入参为父节点，第二个入参为子节点，根节点入参父节点为null
+	 * @return 遍历节点总数
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends TreeNode<R>, R> int forEachTree(List<T> tree, BiConsumer<T, T> consumer) {
+		return forEachTree(tree, node -> {
+			return (List<T>) node.getChildren();
+		}, consumer, null);
+	}
 
 	/**
 	 * 根据指定的集合构建树结构<br>
@@ -198,8 +239,8 @@ class Person implements Treeable<Person> {
 	}
 
 	@Override
-	public void formatChildren(Collection<Person> children) {
-		children.addAll(children.parallelStream().collect(Collectors.toSet()));
+	public void formatChildren(List<Person> children) {
+		this.children = children;
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public class AppProperties {
 	 */
 	private boolean allowLocalCrossDomain = true;
 	/**
-	 * TOKEN存活时间，默认5，单位秒
+	 * TOKEN存活时间，默认300，单位秒，设置30以下默认永不过期
 	 */
 	private long tokenLife = 60l * 5;
 

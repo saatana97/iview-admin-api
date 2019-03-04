@@ -1,11 +1,11 @@
 package cn.saatana.core.utils.tree;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface Treeable<T> {
 	TreeNode<T> convertToTreeNode();
 
-	void formatChildren(Collection<T> children);
+	void formatChildren(List<T> children);
 
 	String uniqueCode();
 }
