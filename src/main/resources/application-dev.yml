@@ -1,6 +1,6 @@
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
 app:
   enable-safer: true
   token-life: 0

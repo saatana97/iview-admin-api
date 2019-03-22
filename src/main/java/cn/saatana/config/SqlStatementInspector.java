@@ -25,10 +25,8 @@ public class SqlStatementInspector implements StatementInspector {
 	/**
 	 * 拼接数据权限SQL
 	 *
-	 * @param scopes
-	 *            数据权限范围
-	 * @param tableAliasName
-	 *            表别名
+	 * @param scopes         数据权限范围
+	 * @param tableAliasName 表别名
 	 * @return SQL字符串
 	 */
 	private String generateAccessScopesSql(Set<Integer> scopes, String tableAliasName) {
@@ -55,8 +53,8 @@ public class SqlStatementInspector implements StatementInspector {
 		if (sql.startsWith("select")) {
 			// 获取当前登录用户信息
 			AuthorizationInformation authInfo = Safer.currentAuthInfo();
-			// admin可以看到任何数据
-			if (authInfo != null && authInfo.getAuth().getId() != 1) {
+			// 超级管理员可以看到任何数据
+			if (!Safer.isSuperAdmin()) {
 				SQLSelectStatement select = (SQLSelectStatement) SQLUtils.parseStatements(sql, JdbcConstants.MYSQL)
 						.get(0);
 				SQLTableSource table = select.getSelect().getQueryBlock().getFrom();
