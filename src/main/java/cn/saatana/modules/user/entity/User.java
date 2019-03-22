@@ -10,7 +10,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -27,9 +26,7 @@ public class User extends CommonEntity {
 	private Authorizer authorizer;
 
 	private String name;
-
-	@DateTimeFormat(pattern = "yyyy年MM月dd日")
-	@JsonFormat(pattern = "yyyy年MM月dd日")
+	@JsonFormat(pattern = "yyyy年MM月dd日", timezone = "GMT+8")
 	private Date birthday;
 
 	private String address;

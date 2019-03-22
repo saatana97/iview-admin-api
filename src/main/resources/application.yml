@@ -8,7 +8,7 @@ logging:
     root: info
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/online?characterEncoding=utf8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/online?characterEncoding=utf8&serverTimezone=GMT%2b8
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -36,7 +36,7 @@ spring:
       pool:
         max-active: 100
         max-wait: 10000
-        max-idle: 20 
+        max-idle: 20
 app:
   enable-safer: true
   log-request-info: true

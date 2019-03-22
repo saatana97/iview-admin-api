@@ -50,16 +50,4 @@ public class AuthorizerController extends CommonController<AuthorizerService, Au
 		Safer.logout();
 		return Res.ok("你已经注销登录");
 	}
-
-	@PostMapping("invalid")
-	@LogOparetion(value = "验证授权码", ignore = true)
-	public Res<Boolean> invalid(String token) {
-		return Res.ok(Safer.getAuthorizerByToken(token) != null);
-	}
-
-	@PostMapping("checkRepeat/{username}")
-	@LogOparetion(value = "用户名校验", ignore = true)
-	public Res<Boolean> checkRepeat(@PathVariable String username) {
-		return Res.ok(service.getByUsername(username) == null);
-	}
 }

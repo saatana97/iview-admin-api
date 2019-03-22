@@ -22,6 +22,18 @@ public class AppProperties {
 	 * TOKEN存活时间，默认300，单位秒，设置30以下默认永不过期
 	 */
 	private long tokenLife = 60l * 5;
+	/**
+	 * 文件最大大小，单位KB，默认20MB
+	 */
+	private long fileMaxSize = 1024l * 20;
+
+	public long getFileMaxSize() {
+		return fileMaxSize;
+	}
+
+	public void setFileMaxSize(long fileMaxSize) {
+		this.fileMaxSize = fileMaxSize;
+	}
 
 	public long getTokenLife() {
 		return tokenLife;

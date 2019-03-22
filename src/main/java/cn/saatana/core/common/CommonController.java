@@ -1,10 +1,13 @@
 package cn.saatana.core.common;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +19,7 @@ import java.util.logging.Logger;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
 
 import org.springframework.beans.BeanUtils;
@@ -27,21 +31,33 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.druid.util.StringUtils;
+
+import cn.saatana.config.AppProperties;
+import cn.saatana.config.TextProperties;
 import cn.saatana.core.Safer;
 import cn.saatana.core.annotation.LogOparetion;
 import cn.saatana.core.auth.entity.Authorizer;
+import cn.saatana.core.utils.ExcelUtils;
 
+@ControllerAdvice
 public abstract class CommonController<Service extends CommonService<Repository, Entity>, Repository extends CommonRepository<Entity>, Entity extends CommonEntity> {
 	protected static final Logger log = Logger.getLogger("CommonController");
 	@Autowired
 	protected Service service;
+	@Autowired
+	protected AppProperties appProp;
+	@Autowired
+	protected TextProperties textProp;
 
 	@LogOparetion("分页查询")
 	@PostMapping("page")
@@ -144,6 +160,42 @@ public abstract class CommonController<Service extends CommonService<Repository,
 		return Res.ok(list);
 	}
 
+	@LogOparetion("导入数据")
+	@PostMapping("import")
+	public Res<Integer> importExcel(MultipartFile file) throws IOException {
+		Res<Integer> res;
+		int count = 0;
+		if (file.getSize() > appProp.getFileMaxSize()) {
+			res = Res.error(textProp.getFileSizeOutOfRangeMessage(), null);
+		} else {
+			List<Entity> list = ExcelUtils.importExcel(getEntityType(), file.getInputStream(), null);
+			service.createAll(list);
+			res = Res.ok(count);
+		}
+		return res;
+	}
+
+	@LogOparetion("导出数据")
+	@PostMapping("export")
+	public Res<Integer> exportExcel(@RequestBody Entity entity, String title, String fileName,
+			HttpServletResponse response) throws IOException {
+		List<Entity> data = service.findList(entity);
+		if (StringUtils.isEmpty(title)) {
+			title = getControllerLogName() + "导出数据";
+		}
+		if (StringUtils.isEmpty(fileName)) {
+			fileName = title + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+		}
+		if (!fileName.endsWith(".xls")) {
+			fileName += ".xls";
+		}
+		ExcelUtils.exportExcel(getEntityType(), data, true, title, null, response.getOutputStream());
+		response.reset();
+		response.setContentType("application/octet-stream; charset=utf-8");
+		response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+		return Res.ok(data.size());
+	}
+
 	/**
 	 * 获取当前授权信息
 	 *
@@ -201,10 +253,8 @@ public abstract class CommonController<Service extends CommonService<Repository,
 	 *
 	 * @see 包装了org.springframework.beans.BeanUtils.copyProperties(Object obj,Object
 	 *      obj,String... ignoreProperties)方法
-	 * @param source
-	 *            源对象
-	 * @param target
-	 *            目标对象
+	 * @param source 源对象
+	 * @param target 目标对象
 	 */
 	protected void copyNotNullProperties(Object source, Object target) {
 		BeanUtils.copyProperties(source, target, getPropertiesWithNullValue(source).toArray(new String[0]));
@@ -253,5 +303,27 @@ public abstract class CommonController<Service extends CommonService<Repository,
 			res = true;
 		}
 		return res;
+	}
+
+	private String getControllerLogName() {
+		String res = "";
+		LogOparetion anno = this.getClass().getAnnotation(LogOparetion.class);
+		if (anno != null) {
+			res = anno.value();
+		}
+		return res;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<Entity> getEntityType() {
+		Class<Entity> type = null;
+		try {
+			type = (Class<Entity>) Class
+					.forName(((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[2]
+							.getTypeName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return type;
 	}
 }
