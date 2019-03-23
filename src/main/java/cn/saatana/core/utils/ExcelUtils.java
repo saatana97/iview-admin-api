@@ -59,9 +59,12 @@ public class ExcelUtils {
 	/**
 	 * 导入数据
 	 *
-	 * @param type   实体类类型
-	 * @param file   数据文件
-	 * @param groups 字段分组
+	 * @param type
+	 *            实体类类型
+	 * @param file
+	 *            数据文件
+	 * @param groups
+	 *            字段分组
 	 * @return
 	 */
 	public static <T> List<T> importExcel(Class<T> type, InputStream is, int[] groups) {
@@ -162,12 +165,18 @@ public class ExcelUtils {
 	/**
 	 * 导出数据
 	 *
-	 * @param type     实体类类型
-	 * @param data     数据
-	 * @param hasIndex 是否添加序号
-	 * @param title    标题
-	 * @param groups   字段分组
-	 * @param os       输出流
+	 * @param type
+	 *            实体类类型
+	 * @param data
+	 *            数据
+	 * @param hasIndex
+	 *            是否添加序号
+	 * @param title
+	 *            标题
+	 * @param groups
+	 *            字段分组
+	 * @param os
+	 *            输出流
 	 */
 	public static <T> void exportExcel(Class<T> type, List<T> data, boolean hasIndex, String title, int[] groups,
 			OutputStream os) {
@@ -301,11 +310,16 @@ public class ExcelUtils {
 	}
 
 	private static boolean containsAny(int[] need, int[] has) {
-		boolean res = true;
+		boolean res = false;
 		if (need != null && has != null) {
 			for (int i = 0; i < has.length; i++) {
-				boolean contain = res = Arrays.asList(need).contains(has[i]);
-				if (contain) {
+				for (int j = 0; j < need.length; j++) {
+					res = has[i] == need[j];
+					if (res) {
+						break;
+					}
+				}
+				if (res) {
 					break;
 				}
 			}

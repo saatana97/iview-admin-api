@@ -12,6 +12,7 @@ import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
+import com.alibaba.druid.stat.TableStat.Column;
 import com.alibaba.druid.util.JdbcConstants;
 
 import cn.saatana.core.Safer;
@@ -25,8 +26,10 @@ public class SqlStatementInspector implements StatementInspector {
 	/**
 	 * 拼接数据权限SQL
 	 *
-	 * @param scopes         数据权限范围
-	 * @param tableAliasName 表别名
+	 * @param scopes
+	 *            数据权限范围
+	 * @param tableAliasName
+	 *            表别名
 	 * @return SQL字符串
 	 */
 	private String generateAccessScopesSql(Set<Integer> scopes, String tableAliasName) {
@@ -79,7 +82,8 @@ public class SqlStatementInspector implements StatementInspector {
 				SQLExpr where = select.getSelect().getQueryBlock().getWhere();
 				if (where != null) {
 					where.accept(visitor);
-					isPrimaryKeyQuery = visitor.containsColumn(tableRealName, "id");
+					Column idCol = visitor.getColumn(tableRealName, "id");
+					isPrimaryKeyQuery = idCol != null && idCol.isWhere();
 				}
 				// 如果是关联表或者是主键查询就不校验数据权限
 				if (!tableRealName.startsWith("r_") && !isPrimaryKeyQuery) {

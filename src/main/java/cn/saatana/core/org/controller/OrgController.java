@@ -44,9 +44,9 @@ public class OrgController extends CommonController<OrgService, OrgRepository, O
 		}
 		if (scopes != null) {
 			TreeUtils.forEachTree(data, (parent, child) -> {
-				if (child.getChildren() == null || child.getChildren().size() == 0) {
-					child.setChecked(scopes.contains(child.getData().getId()));
-				}
+				child.setChecked(scopes.contains(child.getData().getId()));
+				// if (child.getChildren() == null || child.getChildren().size() == 0) {
+				// }
 			});
 		}
 		return Res.ok(data);

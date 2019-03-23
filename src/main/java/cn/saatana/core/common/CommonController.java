@@ -253,8 +253,10 @@ public abstract class CommonController<Service extends CommonService<Repository,
 	 *
 	 * @see 包装了org.springframework.beans.BeanUtils.copyProperties(Object obj,Object
 	 *      obj,String... ignoreProperties)方法
-	 * @param source 源对象
-	 * @param target 目标对象
+	 * @param source
+	 *            源对象
+	 * @param target
+	 *            目标对象
 	 */
 	protected void copyNotNullProperties(Object source, Object target) {
 		BeanUtils.copyProperties(source, target, getPropertiesWithNullValue(source).toArray(new String[0]));

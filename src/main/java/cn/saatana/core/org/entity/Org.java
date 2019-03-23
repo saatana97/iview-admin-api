@@ -47,6 +47,10 @@ public class Org extends CommonEntity implements Treeable<Org>, AccessScopeable 
 	@Transient
 	private List<Org> children = new ArrayList<>();
 
+	@JSONField(serialize = false)
+	@JsonIgnore
+	private Integer scope;
+
 	@Override
 	public TreeNode<Org> convertToTreeNode() {
 		return new TreeNode<>(getId() + "", getTitle(), getParentId(), this, 0, true, false);

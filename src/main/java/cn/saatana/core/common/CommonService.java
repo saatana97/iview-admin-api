@@ -109,6 +109,7 @@ public abstract class CommonService<Repository extends CommonRepository<Entity>,
 		if (entity != null) {
 			entity.preCreate();
 			repository.saveAndFlush(entity);
+			update(entity);
 		}
 	}
 
@@ -125,6 +126,7 @@ public abstract class CommonService<Repository extends CommonRepository<Entity>,
 			});
 			repository.saveAll(entities);
 			repository.flush();
+			updateAll(entities);
 		}
 	}
 

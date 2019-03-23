@@ -63,6 +63,10 @@ public abstract class CommonEntity extends PageQueryable implements Serializable
 	}
 
 	public void preUpdate() {
+		if (this instanceof AccessScopeable) {
+			AccessScopeable temp = (AccessScopeable) this;
+			temp.setScope(temp.getScope());
+		}
 		AuthorizationInformation authInfo = Safer.currentAuthInfo();
 		if (authInfo != null) {
 			this.setUpdator(authInfo.getAuth());

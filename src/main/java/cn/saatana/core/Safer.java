@@ -128,8 +128,7 @@ public class Safer {
 	public static AuthorizationInformation login(Authorizer auth) {
 		HttpServletRequest request = currentRequest();
 		String token = generateToken();
-		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(),
-				auth);
+		AuthorizationInformation userInfo = new AuthorizationInformation(token, request.getSession().getId(), auth);
 		HttpServletResponse response = currentResponse();
 		Cookie cookie = new Cookie("token", token);
 		cookie.setPath("/");
@@ -206,7 +205,8 @@ public class Safer {
 	 * @return
 	 */
 	public static boolean isSuperAdmin() {
-		return currentAuthId() == 1;
+		Integer authId = currentAuthId();
+		return authId != null && authId == 1;
 	}
 
 	/**
