@@ -4,3 +4,4 @@ spring:
 app:
   enable-safer: true
   token-life: 0
+  log-oparetion: false

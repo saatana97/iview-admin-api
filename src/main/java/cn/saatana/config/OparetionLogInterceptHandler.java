@@ -22,12 +22,14 @@ public class OparetionLogInterceptHandler extends HandlerInterceptorAdapter {
 	private final Logger log = Logger.getLogger("GlobalInterceptHandler");
 	@Autowired
 	private OparetionLogService oparetionLogService;
+	@Autowired
+	private AppProperties appProp;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		boolean result = true;
-		if (handler instanceof HandlerMethod) {
+		if (appProp.isLogOparetion() && handler instanceof HandlerMethod) {
 			HandlerMethod method = (HandlerMethod) handler;
 			Class<?> controller = method.getBeanType();
 			LogOparetion canno = controller.getAnnotation(LogOparetion.class);

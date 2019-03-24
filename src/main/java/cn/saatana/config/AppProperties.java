@@ -15,6 +15,10 @@ public class AppProperties {
 	 */
 	private boolean logRequestInfo = true;
 	/**
+	 * 是否记录操作日志
+	 */
+	private boolean logOparetion = true;
+	/**
 	 * 是否允许本地跨域请求
 	 */
 	private boolean allowLocalCrossDomain = true;
@@ -26,6 +30,14 @@ public class AppProperties {
 	 * 文件最大大小，单位KB，默认20MB
 	 */
 	private long fileMaxSize = 1024l * 20;
+
+	public boolean isLogOparetion() {
+		return logOparetion;
+	}
+
+	public void setLogOparetion(boolean logOparetion) {
+		this.logOparetion = logOparetion;
+	}
 
 	public long getFileMaxSize() {
 		return fileMaxSize;

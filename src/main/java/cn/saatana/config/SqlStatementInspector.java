@@ -57,7 +57,7 @@ public class SqlStatementInspector implements StatementInspector {
 			// 获取当前登录用户信息
 			AuthorizationInformation authInfo = Safer.currentAuthInfo();
 			// 超级管理员可以看到任何数据
-			if (!Safer.isSuperAdmin()) {
+			if (authInfo != null && !Safer.isSuperAdmin()) {
 				SQLSelectStatement select = (SQLSelectStatement) SQLUtils.parseStatements(sql, JdbcConstants.MYSQL)
 						.get(0);
 				SQLTableSource table = select.getSelect().getQueryBlock().getFrom();

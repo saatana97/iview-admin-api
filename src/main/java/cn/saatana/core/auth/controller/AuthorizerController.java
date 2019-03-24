@@ -2,6 +2,7 @@ package cn.saatana.core.auth.controller;
 
 import java.util.Date;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,5 +49,11 @@ public class AuthorizerController extends CommonController<AuthorizerService, Au
 	public Res<String> logout() {
 		Safer.logout();
 		return Res.ok("你已经注销登录");
+	}
+
+	@RequestMapping("permission/{permission}")
+	@LogOparetion("权限判断")
+	public Res<Boolean> hasPermission(@PathVariable String permission) {
+		return Res.ok(Safer.isSuperAdmin() || Safer.hasPromission(permission));
 	}
 }

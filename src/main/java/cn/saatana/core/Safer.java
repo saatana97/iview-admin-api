@@ -139,6 +139,17 @@ public class Safer {
 
 	/**
 	 * 判断当前登录授权者是否拥有指定权限
+	 * 
+	 * @param permission
+	 *            权限，多个用,隔开
+	 * @return
+	 */
+	public static boolean hasPromission(String permission) {
+		return hasPermission(permission, PermissionLogic.ALL);
+	}
+
+	/**
+	 * 判断当前登录授权者是否拥有指定权限
 	 *
 	 * @param permission
 	 *            权限，多个用,隔开
