@@ -1,23 +1,24 @@
 server:
-  port: 8888
+  port: 80
   servlet:
-    context-path: /shop-api
+    context-path: /satan-admin
 logging:
-  path: C:/TEMP/MineStore/logs
+  path: C:/LOGS/Satan-Admin
   level:
     root: info
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
   datasource:
-    url: jdbc:mysql://localhost:3306/online?characterEncoding=utf8&serverTimezone=GMT%2b8
+    url: jdbc:mysql://localhost:3306/satan-admin?characterEncoding=utf8&serverTimezone=GMT%2b8
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
+    initialization-mode: embedded
   jpa:
-    properties:
-      hibernate:
-        session_factory:
-          statement_inspector: cn.saatana.config.SqlStatementInspector
     open-in-view: true
     show-sql: false
     hibernate:
@@ -28,15 +29,14 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     default-property-inclusion: non-null
-  redis:
-    host: localhost
-    port: 6379
-    database: 1
-    lettuce:
-      pool:
-        max-active: 100
-        max-wait: 10000
-        max-idle: 20
+    serialization:
+      indent-output: true
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+    parser:
+      allow-unquoted-control-chars: true
+      allow-single-quotes: true
 app:
   enable-safer: true
   log-request-info: true

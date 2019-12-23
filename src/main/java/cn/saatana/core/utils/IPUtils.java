@@ -1,9 +1,8 @@
 package cn.saatana.core.utils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用于获取客户端IP地址

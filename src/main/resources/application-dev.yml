@@ -1,7 +1,12 @@
+server:
+  port: 8888
 spring:
   jpa:
-    show-sql: false
+    show-sql: true
 app:
-  enable-safer: true
+  enable-safer: false
   token-life: 0
   log-oparetion: false
+  log-request-info: true
+  appid: wxecf56c4466c20590
+  appsecret: 774298f0c268d9513343530e043ec010

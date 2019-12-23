@@ -1,8 +1,8 @@
 package cn.saatana.core.common;
 
-import java.util.Date;
-
 import org.springframework.http.HttpStatus;
+
+import java.util.Date;
 
 public class Res<T> {
 	private int status;

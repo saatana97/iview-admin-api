@@ -1,19 +1,14 @@
 package cn.saatana.core.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import cn.saatana.core.utils.tree.TreeNode;
+import cn.saatana.core.utils.tree.Treeable;
+import com.alibaba.druid.util.StringUtils;
+import lombok.Data;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import com.alibaba.druid.util.StringUtils;
-import com.alibaba.fastjson.JSON;
-
-import cn.saatana.core.utils.tree.TreeNode;
-import cn.saatana.core.utils.tree.Treeable;
 
 /**
  * 树结构通用工具类
@@ -30,14 +25,10 @@ public class TreeUtils {
 	/**
 	 * 遍历树结构所有节点并执行指定操作
 	 *
-	 * @param tree
-	 *            树结构数据
-	 * @param getChildren
-	 *            树节点获取子节点的方法，入参为父节点
-	 * @param consumer
-	 *            要对树节点进行的操作，第一个入参为父节点，第二个入参为子节点
-	 * @param root
-	 *            方法内部用，调用时传入什么根节点的操作函数第一个入参就是什么
+	 * @param tree        树结构数据
+	 * @param getChildren 树节点获取子节点的方法，入参为父节点
+	 * @param consumer    要对树节点进行的操作，第一个入参为父节点，第二个入参为子节点
+	 * @param root        方法内部用，调用时传入什么根节点的操作函数第一个入参就是什么
 	 * @return 遍历节点总数
 	 */
 	public static <T> int forEachTree(List<T> tree, Function<T, List<T>> getChildren, BiConsumer<T, T> consumer,
@@ -56,10 +47,8 @@ public class TreeUtils {
 	/**
 	 * 遍历树结构所有节点并执行指定操作
 	 *
-	 * @param tree
-	 *            树结构数据
-	 * @param consumer
-	 *            要对树节点进行的操作，第一个入参为父节点，第二个入参为子节点，根节点入参父节点为null
+	 * @param tree     树结构数据
+	 * @param consumer 要对树节点进行的操作，第一个入参为父节点，第二个入参为子节点，根节点入参父节点为null
 	 * @return 遍历节点总数
 	 */
 	@SuppressWarnings("unchecked")
@@ -73,8 +62,7 @@ public class TreeUtils {
 	 * 根据指定的集合构建树结构<br>
 	 * 实体必须实现<code>cn.saatana.core.utils.tree.Treeable</code>
 	 *
-	 * @param data
-	 *            数据集合
+	 * @param data 数据集合
 	 * @return 树节点集合
 	 */
 	@SuppressWarnings("unchecked")
@@ -120,18 +108,15 @@ public class TreeUtils {
 	 * 根据指定的集合构建树结构<br>
 	 * 实体必须实现<code>cn.saatana.core.utils.tree.Treeable</code>
 	 *
-	 * @param data
-	 *            数据集合
-	 * @param format
-	 *            生成返回数据的格式化函数
-	 * @param setChildren
-	 *            给父级节点数据设置子节点数据
+	 * @param data        数据集合
+	 * @param format      生成返回数据的格式化函数
+	 * @param setChildren 给父级节点数据设置子节点数据
 	 * @return 返回指定格式的集合
 	 */
 	@SuppressWarnings("unchecked")
-	public static <Node extends Treeable<Data>, Data, Format> List<Format> buildTree(Collection<Node> data,
-			Function<TreeNode<Data>, Format> format, BiConsumer<Format, List<Format>> setChildren) {
-		List<TreeNode<Data>> tree = buildTree(data);
+	public static <Node extends Treeable<DT>, DT, Format> List<Format> buildTree(Collection<Node> data,
+			Function<TreeNode<DT>, Format> format, BiConsumer<Format, List<Format>> setChildren) {
+		List<TreeNode<DT>> tree = buildTree(data);
 		List<Format> res = new ArrayList<>();
 		String hashcode = "" + tree.hashCode() + format.hashCode() + setChildren.hashCode();
 		List<Format> cache = formatTreeCache.get(hashcode);
@@ -150,14 +135,10 @@ public class TreeUtils {
 	/**
 	 * 格式化树结构数据为指定格式
 	 *
-	 * @param tree
-	 *            树结构数据
-	 * @param format
-	 *            生成返回数据的格式化函数
-	 * @param getChildren
-	 *            树节点获取子节点集合的函数
-	 * @param setChildren
-	 *            给格式化后的父级节点设置子节点数据的消费者函数
+	 * @param tree        树结构数据
+	 * @param format      生成返回数据的格式化函数
+	 * @param getChildren 树节点获取子节点集合的函数
+	 * @param setChildren 给格式化后的父级节点设置子节点数据的消费者函数
 	 * @return 格式化后的树结构数据
 	 */
 	public static <Node, Format> List<Format> formatTree(List<Node> tree, Function<Node, Format> format,
@@ -213,6 +194,7 @@ public class TreeUtils {
 	}
 }
 
+@Data
 class Person implements Treeable<Person> {
 	private int id;
 	private String name;
@@ -246,51 +228,6 @@ class Person implements Treeable<Person> {
 	@Override
 	public String uniqueCode() {
 		return id + "";
-	}
-
-	@Override
-	public String toString() {
-		return JSON.toJSONString(this);
-	}
-
-	public List<Person> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<Person> children) {
-		this.children = children;
-	}
-
-	public Integer getParent() {
-		return parent;
-	}
-
-	public void setParent(Integer parent) {
-		this.parent = parent;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
 	}
 
 }

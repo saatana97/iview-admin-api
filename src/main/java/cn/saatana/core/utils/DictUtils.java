@@ -1,13 +1,12 @@
 package cn.saatana.core.utils;
 
-import java.util.List;
-
+import cn.saatana.module.system.dict.entity.Dictionary;
+import cn.saatana.module.system.dict.service.DictionaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.stereotype.Component;
 
-import cn.saatana.core.dict.entity.Dictionary;
-import cn.saatana.core.dict.service.DictionaryService;
+import java.util.List;
 
 @Component
 public class DictUtils {

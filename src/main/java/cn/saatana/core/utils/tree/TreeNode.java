@@ -1,11 +1,12 @@
 package cn.saatana.core.utils.tree;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
-
+@Data
 public class TreeNode<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String code;
@@ -41,98 +42,5 @@ public class TreeNode<T> implements Serializable {
 		this.sort = sort;
 		this.expand = expand;
 		this.disabled = disabled;
-	}
-
-	@Override
-	public String toString() {
-		return JSON.toJSONString(this);
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public boolean isExpand() {
-		return expand;
-	}
-
-	public void setExpand(boolean expand) {
-		this.expand = expand;
-	}
-
-	public boolean isDisabled() {
-		return disabled;
-	}
-
-	public void setDisabled(boolean disabled) {
-		this.disabled = disabled;
-	}
-
-	public boolean isDisableCheckbox() {
-		return disableCheckbox;
-	}
-
-	public void setDisableCheckbox(boolean disableCheckbox) {
-		this.disableCheckbox = disableCheckbox;
-	}
-
-	public boolean isSelected() {
-		return selected;
-	}
-
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
-
-	public boolean isChecked() {
-		return checked;
-	}
-
-	public void setChecked(boolean checked) {
-		this.checked = checked;
-	}
-
-	public T getData() {
-		return data;
-	}
-
-	public void setData(T data) {
-		this.data = data;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public int getSort() {
-		return sort;
-	}
-
-	public void setSort(int sort) {
-		this.sort = sort;
-	}
-
-	public String getParent() {
-		return parent;
-	}
-
-	public void setParent(String parent) {
-		this.parent = parent;
-	}
-
-	public List<TreeNode<T>> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<TreeNode<T>> children) {
-		this.children = children;
 	}
 }

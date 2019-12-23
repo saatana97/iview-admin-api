@@ -1,11 +1,32 @@
 package cn.saatana.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Getter
+@Setter
 @Component
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
+	/**
+	 * 微信服务器TOKEN
+	 */
+	private String token = "saatana";
+	/**
+	 * 微信公众号appid
+	 */
+	private String appid;
+	/**
+	 * 微信公众号appsercret;
+	 */
+	private String appsecret;
+	/**
+	 * 获取access_token最大重试次数
+	 */
+	private int accessTokenRetryTime = 3;
+
 	/**
 	 * 是否开启授权TOKEN验证
 	 */
@@ -27,55 +48,11 @@ public class AppProperties {
 	 */
 	private long tokenLife = 60l * 5;
 	/**
-	 * 文件最大大小，单位KB，默认20MB
+	 * 文件默认保存目录
 	 */
-	private long fileMaxSize = 1024l * 20;
-
-	public boolean isLogOparetion() {
-		return logOparetion;
-	}
-
-	public void setLogOparetion(boolean logOparetion) {
-		this.logOparetion = logOparetion;
-	}
-
-	public long getFileMaxSize() {
-		return fileMaxSize;
-	}
-
-	public void setFileMaxSize(long fileMaxSize) {
-		this.fileMaxSize = fileMaxSize;
-	}
-
-	public long getTokenLife() {
-		return tokenLife;
-	}
-
-	public void setTokenLife(long tokenLife) {
-		this.tokenLife = tokenLife;
-	}
-
-	public boolean isAllowLocalCrossDomain() {
-		return allowLocalCrossDomain;
-	}
-
-	public void setAllowLocalCrossDomain(boolean allowLocalCrossDomain) {
-		this.allowLocalCrossDomain = allowLocalCrossDomain;
-	}
-
-	public boolean isLogRequestInfo() {
-		return logRequestInfo;
-	}
-
-	public void setLogRequestInfo(boolean logRequestInfo) {
-		this.logRequestInfo = logRequestInfo;
-	}
-
-	public boolean isEnableSafer() {
-		return enableSafer;
-	}
-
-	public void setEnableSafer(boolean enableSafer) {
-		this.enableSafer = enableSafer;
-	}
+	private String fileBaseDir = "C:/Uploads/WechatAdmin/";
+	/**
+	 * 文件默认上传临时目录
+	 */
+	private String fileTempDir = "C:/Uploads/WechatAdmin/temp/";
 }

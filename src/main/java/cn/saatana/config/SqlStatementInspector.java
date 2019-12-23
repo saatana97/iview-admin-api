@@ -2,6 +2,7 @@ package cn.saatana.config;
 
 import java.util.Set;
 
+import cn.saatana.module.system.user.entity.UserInfo;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,9 +17,8 @@ import com.alibaba.druid.stat.TableStat.Column;
 import com.alibaba.druid.util.JdbcConstants;
 
 import cn.saatana.core.Safer;
-import cn.saatana.core.auth.entity.AuthorizationInformation;
 
-@Configuration
+//@Configuration
 public class SqlStatementInspector implements StatementInspector {
 	private static final long serialVersionUID = 1L;
 	// private final Logger log = Logger.getLogger("SqlStatementInspector");
@@ -55,7 +55,7 @@ public class SqlStatementInspector implements StatementInspector {
 	public String inspect(String sql) {
 		if (sql.startsWith("select")) {
 			// 获取当前登录用户信息
-			AuthorizationInformation authInfo = Safer.currentAuthInfo();
+			UserInfo authInfo = Safer.currentAuthInfo();
 			// 超级管理员可以看到任何数据
 			if (authInfo != null && !Safer.isSuperAdmin()) {
 				SQLSelectStatement select = (SQLSelectStatement) SQLUtils.parseStatements(sql, JdbcConstants.MYSQL)
