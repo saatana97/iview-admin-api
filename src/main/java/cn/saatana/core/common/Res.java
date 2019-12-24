@@ -11,7 +11,7 @@ public class Res<T> {
 	private Date serviceTime = new Date();
 
 	public static <T> Res<T> ok(T data) {
-		return of(HttpStatus.OK.value(), "操作成功", data);
+		return of(HttpStatus.OK.value(), null, data);
 	}
 
 	public static <T> Res<T> ok(String message, T data) {

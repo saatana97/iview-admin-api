@@ -5,6 +5,8 @@ import cn.saatana.core.common.Res;
 import cn.saatana.module.system.file.entity.Resource;
 import cn.saatana.module.system.file.repository.ResourceRepository;
 import cn.saatana.module.system.file.service.ResourceService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.unit.DataSize;
 import org.springframework.validation.BindingResult;
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/resource")
+@Api("资源管理")
 public class ResourceController extends CurdController<ResourceService, ResourceRepository, Resource> {
 	@Value("${spring.servlet.multipart.max-file-size}")
 	private DataSize fileMaxSize;
@@ -44,6 +47,7 @@ public class ResourceController extends CurdController<ResourceService, Resource
 		}
 	}
 
+	@ApiOperation("上传")
 	@PostMapping("upload")
 	public Res<String> upload(MultipartFile file) {
 		if (DataSize.ofBytes(file.getSize()).compareTo(fileMaxSize) > 0) {
@@ -66,7 +70,8 @@ public class ResourceController extends CurdController<ResourceService, Resource
 		return Res.ok(name);
 	}
 
-	@RequestMapping("download/{id}")
+	@ApiOperation("下载")
+	@GetMapping("download/{id}")
 	public void downlaod(@PathVariable String id, HttpServletResponse response) throws UnsupportedEncodingException {
 		Resource entity = service.get(id);
 		String[] temp = entity.getPath().split("\\.");

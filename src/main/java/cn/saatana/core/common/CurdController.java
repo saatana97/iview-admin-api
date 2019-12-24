@@ -3,8 +3,8 @@ package cn.saatana.core.common;
 import cn.saatana.config.AppProperties;
 import cn.saatana.config.TextProperties;
 import cn.saatana.core.Safer;
-import cn.saatana.module.system.user.entity.UserInfo;
 import cn.saatana.module.system.user.entity.User;
+import cn.saatana.module.system.user.entity.UserInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
@@ -65,13 +65,13 @@ public abstract class CurdController<Service extends CurdService<Repository, Ent
 	}
 
 	@ApiOperation("重复校验")
-	@RequestMapping("check")
+	@PostMapping("check")
 	public Res<List<Entity>> check(@RequestBody Entity entity) {
 		return Res.ok(service.findList(entity, StringMatcher.EXACT));
 	}
 
 	@ApiOperation("列表查询")
-	@RequestMapping("all")
+	@GetMapping("all")
 	public Res<List<Entity>> all() {
 		return Res.ok(service.findAll());
 	}
